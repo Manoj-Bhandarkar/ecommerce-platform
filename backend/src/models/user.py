@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Boolean, DateTime, ForeignKey
+from sqlalchemy import String, Boolean, DateTime
 from datetime import datetime, timezone
 from src.db.base import Base
-from src.models.refresh_token import RefreshToken
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.models.refresh_token import RefreshToken
 
 class User(Base):
     __tablename__ = "users"
