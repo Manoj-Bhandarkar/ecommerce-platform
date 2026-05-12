@@ -15,7 +15,6 @@ class RefreshToken(TimestampMixin, Base):
     id: Mapped[int] = mapped_column(UUID(as_uuid=True),primary_key=True, default=uuid4)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     token: Mapped[str] = mapped_column(String(500), nullable=False)
-
     revoked: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user: Mapped["User"] = relationship("User", back_populates="refresh_tokens")

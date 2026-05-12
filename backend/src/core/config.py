@@ -9,8 +9,9 @@ class Settings(BaseSettings):
     DB_PASS: str
 
     JWT_SECRET_KEY: str
-    JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_DAYS: int
 
     PROJECT_NAME: str = "FastAPI E-Commerce Backend"
     API_V1_STR: str = "/api/v1"
