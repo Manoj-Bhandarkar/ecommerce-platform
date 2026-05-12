@@ -14,3 +14,8 @@ class TimestampMixin:
         onupdate=lambda: datetime.now(timezone.utc)
     )
 
+class ExpiryMixin:
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False
+    )

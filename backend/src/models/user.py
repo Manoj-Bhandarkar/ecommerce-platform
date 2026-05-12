@@ -4,6 +4,7 @@ from src.db.base import Base
 from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
 from src.models.common import TimestampMixin
+from uuid import UUID as PyUUID
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 class User(TimestampMixin, Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(UUID(as_uuid=True),primary_key=True, default=uuid4)
+    id: Mapped[PyUUID] = mapped_column(UUID(as_uuid=True),primary_key=True, default=uuid4)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
