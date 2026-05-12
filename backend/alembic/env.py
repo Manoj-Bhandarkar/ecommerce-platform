@@ -8,7 +8,6 @@ from alembic import context
 
 from src.db.base import Base
 from src.core.config import settings
-
 from src.db import models
 
 # this is the Alembic Config object, which provides
@@ -22,6 +21,7 @@ DB_PORT = settings.DB_PORT
 DB_HOST = settings.DB_HOST
 
 DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 
