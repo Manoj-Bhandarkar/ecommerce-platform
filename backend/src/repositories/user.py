@@ -16,3 +16,8 @@ class UserRepository:
         await session.commit()
         await session.refresh(user)
         return user
+
+    @staticmethod
+    async def get_by_id(session: AsyncSession, user_id: int):
+        stmt = select(User).where(User.id == user_id)
+        return await session.scalar(stmt)
