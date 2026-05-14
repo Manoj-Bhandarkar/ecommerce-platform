@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int
 
     PROJECT_NAME: str = "FastAPI E-Commerce Backend"
-    API_V1_STR: str = "/api/v1"
+    API_PREFIX: str = "/api/v1"
     CORS_ORIGINS: List[str] = ["http://localhost:3000"]
 
     model_config = SettingsConfigDict(

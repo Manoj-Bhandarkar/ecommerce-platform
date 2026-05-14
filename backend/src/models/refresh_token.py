@@ -14,7 +14,7 @@ class RefreshToken(TimestampMixin,ExpiryMixin, Base):
     __tablename__ = "refresh_token"
 
     id: Mapped[PyUUID] = mapped_column(UUID(as_uuid=True),primary_key=True, default=uuid4)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    user_id: Mapped[PyUUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     token: Mapped[str] = mapped_column(String(500), nullable=False)
     revoked: Mapped[bool] = mapped_column(Boolean, default=False)
 

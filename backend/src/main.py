@@ -20,5 +20,5 @@ async def root():
     return {"message": "Welcome to the E-Commerce API"}
 
 
-app.include_router(account_router, prefix="/api/v1/account", tags=["Account"])
-app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
+app.include_router(account_router, prefix=f"{settings.API_PREFIX}/account", tags=["Account"])
+app.include_router(auth_router, prefix=f"{settings.API_PREFIX}/auth", tags=["Auth"])
