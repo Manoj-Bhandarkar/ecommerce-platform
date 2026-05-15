@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
+import secrets
 from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
-import uuid
 from src.core.config import settings
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
@@ -26,7 +26,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     )
 
 def create_refresh_token():
-    return str(uuid.uuid4())
+    return secrets.token_urlsafe(64)
 
 def decode_token(token: str):
     try:

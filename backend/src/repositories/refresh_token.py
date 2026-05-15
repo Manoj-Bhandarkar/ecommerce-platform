@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.src.api.auth import refresh_token
+
 from src.models.refresh_token import RefreshToken
 from sqlalchemy import select
 

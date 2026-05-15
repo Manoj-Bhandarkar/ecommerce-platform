@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from backend.src.models.user import User
 from src.schemas.auth import UserLogin
 from src.repositories.user import UserRepository
 from src.repositories.refresh_token import RefreshTokenRepository
@@ -8,24 +9,25 @@ from src.core.security import verify_password, create_access_token, create_refre
 from src.core.config import settings
 
 
-async def login_user(session: AsyncSession, user_login: UserLogin):
+async def authenticate_user(session: AsyncSession, user_login: UserLogin):
     user = await UserRepository.get_by_email(session=session, email=user_login.email)
-    if not user:
+    if not user or not verify_password(user_login.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
-    if not verify_password(user_login.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
-        )
+    return user
 
+
+# CREATE BOTH TOKENS
+async def create_tokens(session: AsyncSession, user: User):
+    # ACCESS TOKEN
     access_token = create_access_token(data={"sub": str(user.id)})
+    # REFRESH TOKEN STRING
     refresh_token_str = create_refresh_token()
-
     expires_at = datetime.now(timezone.utc) + timedelta(
         days=settings.REFRESH_TOKEN_EXPIRE_DAYS
     )
-
+    # SAVE REFRESH TOKEN IN DB
     refresh_token = await RefreshTokenRepository.create(
         session=session,
         token_data={
@@ -34,8 +36,13 @@ async def login_user(session: AsyncSession, user_login: UserLogin):
             "expires_at": expires_at,
         },
     )
-
     return {"access_token": access_token, "refresh_token": refresh_token.token}
+
+
+# LOGIN FLOW
+async def login_user(session: AsyncSession, user_login: UserLogin):
+    user = await authenticate_user(session=session, user_login=user_login)
+    return await create_tokens(session=session, user=user)
 
 
 async def verify_refresh_token(session: AsyncSession, token: str):
