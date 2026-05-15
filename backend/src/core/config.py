@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 
+
 class Settings(BaseSettings):
     DB_HOST: str
     DB_PORT: int
@@ -17,10 +18,11 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
     CORS_ORIGINS: List[str] = ["http://localhost:3000"]
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        extra="ignore"
-    )
+    EMAIL_VERIFICATION_TOKEN_TIME_HOUR: int
+    EMAIL_PASSWORD_RESET_TOKEN_TIME_HOUR: int
+    FRONTEND_URL: str
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 settings = Settings()

@@ -1,11 +1,17 @@
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.src.models.user import User
+from src.models.user import User
 from src.schemas.auth import UserLogin
 from src.repositories.user import UserRepository
 from src.repositories.refresh_token import RefreshTokenRepository
-from src.core.security import verify_password, create_access_token, create_refresh_token
+from src.core.security import (
+    verify_password,
+    create_access_token,
+    create_refresh_token,
+    create_email_verification_token,
+    verify_email_token,
+)
 from src.core.config import settings
 
 
@@ -74,3 +80,30 @@ async def verify_refresh_token(session: AsyncSession, token: str):
         )
     await RefreshTokenRepository.revoke(session=session, refresh_token=db_refresh_token)
     return user
+
+
+async def send_verification_email(user: User):
+    token = create_email_verification_token(user.id)
+    verification_link = f"{settings.FRONTEND_URL}" f"/verify-email?token={token}"
+    print(f"Verification Link: " f"{verification_link}")
+    return {"message": "Verification email sent successfully"}
+
+
+async def verify_user_email(session: AsyncSession, token: str):
+    user_id = verify_email_token(token)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
+        )
+    user = await UserRepository.get_by_id(session=session, user_id=int(user_id))
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    if user.is_verified:
+        return {"message": "Email already verified"}
+    
+    # set user as verified
+    await UserRepository.verify_user_email(session=session, user=user)
+    
+    return {"message": "Email verified successfully"}

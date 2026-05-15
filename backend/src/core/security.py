@@ -25,15 +25,42 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
     )
 
+
 def create_refresh_token():
     return secrets.token_urlsafe(64)
 
+
 def decode_token(token: str):
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
         return payload
 
     except ExpiredSignatureError:
         return None
     except JWTError:
         return None
+
+
+def create_email_verification_token(user_id: int):
+    expire = datetime.now(timezone.utc) + timedelta(
+        hours=settings.EMAIL_VERIFICATION_TOKEN_TIME_HOUR
+    )
+    payload = {
+        "sub": str(user_id),
+        "type": "verify_email",
+        "exp": expire,
+    }
+    return jwt.encode(
+        payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+    )
+
+
+def verify_email_token(token: str):
+    payload = decode_token(token)
+    if not payload:
+        return None
+    if payload.get("type") != "verify_email":
+        return None
+    return payload.get("sub")

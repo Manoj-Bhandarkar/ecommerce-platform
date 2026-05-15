@@ -21,3 +21,10 @@ class UserRepository:
     async def get_by_id(session: AsyncSession, user_id: int):
         stmt = select(User).where(User.id == user_id)
         return await session.scalar(stmt)
+
+    @staticmethod
+    async def verify_user_email(session: AsyncSession, user: User):
+        user.is_verified = True
+        await session.commit()
+        await session.refresh(user)
+        return user
