@@ -1,5 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from backend.src.api.auth import refresh_token
 from src.models.refresh_token import RefreshToken
+from sqlalchemy import select
 
 
 class RefreshTokenRepository:
@@ -10,3 +12,14 @@ class RefreshTokenRepository:
         await session.commit()
         await session.refresh(refresh_token)
         return refresh_token
+
+    @staticmethod
+    async def get_by_token(session: AsyncSession, token: str):
+        stmt = select(RefreshToken).where(RefreshToken.token == token)
+        return await session.scalar(stmt)
+
+
+    @staticmethod
+    async def revoke(session: AsyncSession, refresh_token: RefreshToken):
+        refresh_token.revoked = True
+        await session.commit()

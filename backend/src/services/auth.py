@@ -36,3 +36,34 @@ async def login_user(session: AsyncSession, user_login: UserLogin):
     )
 
     return {"access_token": access_token, "refresh_token": refresh_token.token}
+
+
+async def verify_refresh_token(session: AsyncSession, token: str):
+    db_refresh_token = await RefreshTokenRepository.get_by_token(
+        session=session, token=token
+    )
+    if not db_refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
+        )
+
+    if db_refresh_token.revoked:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token revoked"
+        )
+    expires_at = db_refresh_token.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired"
+        )
+    user = await UserRepository.get_by_id(
+        session=session, user_id=db_refresh_token.user_id
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
+    await RefreshTokenRepository.revoke(session=session, refresh_token=db_refresh_token)
+    return user
