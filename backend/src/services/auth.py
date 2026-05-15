@@ -7,12 +7,14 @@ from src.repositories.user import UserRepository
 from src.repositories.refresh_token import RefreshTokenRepository
 from src.core.security import (
     verify_password,
+    hash_password,
     create_access_token,
     create_refresh_token,
     create_email_verification_token,
     verify_email_token,
 )
 from src.core.config import settings
+from src.schemas.auth import PasswordChangeRequest
 
 
 async def authenticate_user(session: AsyncSession, user_login: UserLogin):
@@ -102,8 +104,31 @@ async def verify_user_email(session: AsyncSession, token: str):
         )
     if user.is_verified:
         return {"message": "Email already verified"}
-    
     # set user as verified
     await UserRepository.verify_user_email(session=session, user=user)
-    
     return {"message": "Email verified successfully"}
+
+
+async def change_password(
+    session: AsyncSession, user: User, data: PasswordChangeRequest
+):
+    # VERIFY OLD PASSWORD
+    if not verify_password(data.old_password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Old password incorrect"
+        )
+    # PREVENT SAME PASSWORD
+    if data.old_password == data.new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different",
+        )
+    # UPDATE PASSWORD
+    user.hashed_password = hash_password(data.new_password)
+    await session.commit()
+    # REVOKE ALL REFRESH TOKENS
+    await RefreshTokenRepository.revoke_all_user_tokens(
+        session=session, user_id=user.id
+    )
+
+    return {"message": "Password changed successfully"}

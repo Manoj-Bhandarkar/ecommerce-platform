@@ -2,6 +2,10 @@ from fastapi import APIRouter, HTTPException, Request, status, Depends
 from fastapi.responses import JSONResponse
 from src.core.database import SessionDep
 from src.schemas.auth import UserLogin
+from fastapi import Depends, APIRouter
+from src.schemas.auth import PasswordChangeRequest
+from src.services.auth import change_password
+from src.models.user import User
 from src.services.auth import (
     login_user,
     verify_refresh_token,
@@ -10,7 +14,6 @@ from src.services.auth import (
     verify_user_email,
 )
 from src.core.dependencies import get_current_user
-from src.models.user import User
 
 router = APIRouter()
 
@@ -86,3 +89,19 @@ async def send_email_verification(user: User = Depends(get_current_user)):
 @router.get("/verify-email")
 async def verify_email(session: SessionDep, token: str):
     return await verify_user_email(session=session, token=token)
+
+
+@router.post("/change-password")
+async def password_change(
+    session: SessionDep,
+    data: PasswordChangeRequest,
+    user: User = Depends(get_current_user),
+):
+    await change_password(session=session, user=user, data=data)
+    response = JSONResponse(
+        content={"message": "Password changed successfully. Please login again."}
+    )
+    # LOGOUT USER
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
+    return response
