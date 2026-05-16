@@ -2,8 +2,7 @@ from fastapi import APIRouter, HTTPException, Request, status, Depends
 from fastapi.responses import JSONResponse
 from src.core.database import SessionDep
 from src.schemas.auth import UserLogin
-from fastapi import Depends, APIRouter
-from src.schemas.auth import PasswordChangeRequest
+from src.schemas.auth import PasswordChangeRequest, PasswordResetEmailRequest, PasswordResetRequest
 from src.services.auth import change_password
 from src.models.user import User
 from src.services.auth import (
@@ -12,6 +11,8 @@ from src.services.auth import (
     create_tokens,
     send_verification_email,
     verify_user_email,
+    send_password_reset_email,
+    reset_password,
 )
 from src.core.dependencies import get_current_user
 
@@ -105,3 +106,13 @@ async def password_change(
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return response
+
+
+@router.post("/send-password-reset-email")
+async def send_reset_email(session: SessionDep, data: PasswordResetEmailRequest):
+    return await send_password_reset_email(session=session, data=data)
+
+
+@router.post("/reset-password")
+async def reset_password_route(session: SessionDep, data: PasswordResetRequest):
+    return await reset_password(session=session, data=data)

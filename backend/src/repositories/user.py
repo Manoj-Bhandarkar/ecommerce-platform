@@ -28,3 +28,10 @@ class UserRepository:
         await session.commit()
         await session.refresh(user)
         return user
+
+    @staticmethod
+    async def update_password(session: AsyncSession, user: User, hashed_password: str):
+        user.hashed_password = hashed_password
+        await session.commit()
+        await session.refresh(user)
+        return user

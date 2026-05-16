@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.user import User
-from src.schemas.auth import UserLogin
+from src.schemas.auth import UserLogin, PasswordResetEmailRequest, PasswordResetRequest
 from src.repositories.user import UserRepository
 from src.repositories.refresh_token import RefreshTokenRepository
 from src.core.security import (
@@ -12,6 +12,8 @@ from src.core.security import (
     create_refresh_token,
     create_email_verification_token,
     verify_email_token,
+    create_password_reset_token,
+    verify_password_reset_token
 )
 from src.core.config import settings
 from src.schemas.auth import PasswordChangeRequest
@@ -97,7 +99,7 @@ async def verify_user_email(session: AsyncSession, token: str):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
         )
-    user = await UserRepository.get_by_id(session=session, user_id=int(user_id))
+    user = await UserRepository.get_by_id(session=session, user_id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
@@ -132,3 +134,47 @@ async def change_password(
     )
 
     return {"message": "Password changed successfully"}
+
+
+async def send_password_reset_email(
+    session: AsyncSession, data: PasswordResetEmailRequest
+):
+    user = await UserRepository.get_by_email(session=session, email=data.email)
+
+    # SECURITY:
+    # Don't reveal whether email exists
+    if not user:
+        return {"message": "If account exists, reset link sent"}
+    token = create_password_reset_token(user.id)
+    reset_link = f"{settings.FRONTEND_URL}" f"/reset-password?token={token}"
+    print(f"Password Reset Link: " f"{reset_link}")
+    return {"message": "Password reset link sent"}
+
+
+async def reset_password(session: AsyncSession, data: PasswordResetRequest):
+    user_id = verify_password_reset_token(data.token)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
+        )
+    user = await UserRepository.get_by_id(session=session, user_id=int(user_id))
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    # PREVENT SAME PASSWORD
+    if verify_password(data.new_password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different",
+        )
+    # UPDATE PASSWORD
+    hashed_password = hash_password(data.new_password)
+    await UserRepository.update_password(
+        session=session, user=user, hashed_password=hashed_password
+    )
+    # REVOKE ALL REFRESH TOKENS
+    await RefreshTokenRepository.revoke_all_user_tokens(
+        session=session, user_id=user.id
+    )
+    return {"message": "Password reset successful"}

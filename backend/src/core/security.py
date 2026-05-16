@@ -64,3 +64,26 @@ def verify_email_token(token: str):
     if payload.get("type") != "verify_email":
         return None
     return payload.get("sub")
+
+
+def create_password_reset_token(user_id: int):
+    expire = datetime.now(timezone.utc) + timedelta(
+        hours=settings.EMAIL_PASSWORD_RESET_TOKEN_TIME_HOUR
+    )
+    payload = {
+        "sub": str(user_id),
+        "type": "password_reset",
+        "exp": expire,
+    }
+    return jwt.encode(
+        payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+    )
+
+
+def verify_password_reset_token(token: str):
+    payload = decode_token(token)
+    if not payload:
+        return None
+    if payload.get("type") != "password_reset":
+        return None
+    return payload.get("sub")
