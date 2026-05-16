@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from src.models.user import User
@@ -18,7 +19,7 @@ class UserRepository:
         return user
 
     @staticmethod
-    async def get_by_id(session: AsyncSession, user_id: int):
+    async def get_by_id(session: AsyncSession, user_id: UUID):
         stmt = select(User).where(User.id == user_id)
         return await session.scalar(stmt)
 

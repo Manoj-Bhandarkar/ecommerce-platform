@@ -17,6 +17,7 @@ from src.core.security import (
 )
 from src.core.config import settings
 from src.schemas.auth import PasswordChangeRequest
+from src.core.email import send_email
 
 
 async def authenticate_user(session: AsyncSession, user_login: UserLogin):
@@ -87,9 +88,21 @@ async def verify_refresh_token(session: AsyncSession, token: str):
 
 
 async def send_verification_email(user: User):
+    if user.is_verified:
+        return {"message": "Email already verified"}
     token = create_email_verification_token(user.id)
     verification_link = f"{settings.FRONTEND_URL}" f"/verify-email?token={token}"
-    print(f"Verification Link: " f"{verification_link}")
+    await send_email(
+        subject="Verify Your Email",
+        recipients=[user.email],
+        body=f"""
+    <h2>Email Verification</h2>
+    <p>Please click the link below to verify your email:</p>
+    <a href="{verification_link}">
+        Verify Email
+    </a>
+    """,
+    )
     return {"message": "Verification email sent successfully"}
 
 
@@ -145,9 +158,20 @@ async def send_password_reset_email(
     # Don't reveal whether email exists
     if not user:
         return {"message": "If account exists, reset link sent"}
+
     token = create_password_reset_token(user.id)
+
     reset_link = f"{settings.FRONTEND_URL}" f"/reset-password?token={token}"
-    print(f"Password Reset Link: " f"{reset_link}")
+
+    await send_email(
+        subject="Reset Your Password",
+        recipients=[user.email],
+        body=f"""
+        <h2>Password Reset</h2>
+        <p>Please click below link to reset your password:</p>
+        <a href="{reset_link}">Reset Password</a>
+        """,
+    )
     return {"message": "Password reset link sent"}
 
 
@@ -157,7 +181,7 @@ async def reset_password(session: AsyncSession, data: PasswordResetRequest):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
         )
-    user = await UserRepository.get_by_id(session=session, user_id=int(user_id))
+    user = await UserRepository.get_by_id(session=session, user_id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
