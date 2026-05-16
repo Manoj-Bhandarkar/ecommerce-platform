@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.core.config import settings
 from src.api.user import router as account_router
 from src.api.auth import router as auth_router
+from src.api.admin import router as admin_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -20,5 +21,8 @@ async def root():
     return {"message": "Welcome to the E-Commerce API"}
 
 
-app.include_router(account_router, prefix=f"{settings.API_PREFIX}/account", tags=["Account"])
+app.include_router(
+    account_router, prefix=f"{settings.API_PREFIX}/account", tags=["Account"]
+)
 app.include_router(auth_router, prefix=f"{settings.API_PREFIX}/auth", tags=["Auth"])
+app.include_router(admin_router, prefix=f"{settings.API_PREFIX}/admin", tags=["Admin"])

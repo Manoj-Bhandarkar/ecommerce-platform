@@ -13,7 +13,7 @@ from src.core.security import (
     create_email_verification_token,
     verify_email_token,
     create_password_reset_token,
-    verify_password_reset_token
+    verify_password_reset_token,
 )
 from src.core.config import settings
 from src.schemas.auth import PasswordChangeRequest
@@ -178,3 +178,11 @@ async def reset_password(session: AsyncSession, data: PasswordResetRequest):
         session=session, user_id=user.id
     )
     return {"message": "Password reset successful"}
+
+
+async def logout_user(session: AsyncSession, refresh_token: str | None):
+    if refresh_token:
+        await RefreshTokenRepository.revoke_by_token(
+            session=session, token=refresh_token
+        )
+    return {"message": "Logged out successfully"}

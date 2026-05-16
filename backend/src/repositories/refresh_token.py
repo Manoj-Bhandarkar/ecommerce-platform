@@ -18,14 +18,25 @@ class RefreshTokenRepository:
         stmt = select(RefreshToken).where(RefreshToken.token == token)
         return await session.scalar(stmt)
 
-
     @staticmethod
     async def revoke(session: AsyncSession, refresh_token: RefreshToken):
         refresh_token.revoked = True
         await session.commit()
 
     @staticmethod
-    async def revoke_all_user_tokens(session: AsyncSession,user_id: int):
-        stmt = (update(RefreshToken).where(RefreshToken.user_id == user_id).values(revoked=True))
+    async def revoke_all_user_tokens(session: AsyncSession, user_id: int):
+        stmt = (
+            update(RefreshToken)
+            .where(RefreshToken.user_id == user_id)
+            .values(revoked=True)
+        )
+        await session.execute(stmt)
+        await session.commit()
+
+    @staticmethod
+    async def revoke_by_token(session: AsyncSession, token: str):
+        stmt = (
+            update(RefreshToken).where(RefreshToken.token == token).values(revoked=True)
+        )
         await session.execute(stmt)
         await session.commit()
