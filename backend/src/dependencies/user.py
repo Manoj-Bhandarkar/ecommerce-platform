@@ -1,8 +1,6 @@
 from fastapi import HTTPException, status, Request
-from sqlalchemy import select
 from src.repositories.user import UserRepository
 from src.core.database import SessionDep
-from src.models.user import User
 from src.core.security import decode_token
 
 

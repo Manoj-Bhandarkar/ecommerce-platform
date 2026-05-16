@@ -14,7 +14,7 @@ from src.services.auth import (
     send_password_reset_email,
     reset_password,
 )
-from src.core.dependencies import get_current_user
+from src.dependencies.user import get_current_user
 
 router = APIRouter()
 

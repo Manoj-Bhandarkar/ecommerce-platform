@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
-from src.core.dependencies import get_current_user
+from src.dependencies.user import get_current_user
 from src.models.user import User
 from src.core.database import SessionDep
 from src.schemas.user import UserCreate, UserOut
