@@ -37,3 +37,9 @@ class CategoryRepository:
     async def delete(session: AsyncSession, category: Category):
         await session.delete(category)
         await session.commit()
+
+    @staticmethod
+    async def get_by_ids(session: AsyncSession, category_ids: list[int]):
+        stmt = select(Category).where(Category.id.in_(category_ids))
+        result = await session.scalars(stmt)
+        return result.all()
