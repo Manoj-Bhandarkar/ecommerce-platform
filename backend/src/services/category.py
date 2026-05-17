@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from slugify import slugify
 
@@ -25,3 +25,21 @@ async def create_category(session: AsyncSession, category: CategoryCreate):
             "slug": slug,
         },
     )
+
+
+async def get_all_categories(session: AsyncSession):
+    return await CategoryRepository.get_all(session=session)
+
+
+async def delete_category(session: AsyncSession, category_id: int):
+    category = await CategoryRepository.get_by_id(
+        session=session, category_id=category_id
+    )
+
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category not found",
+        )
+
+    await CategoryRepository.delete(session=session, category=category)

@@ -22,3 +22,18 @@ class CategoryRepository:
         await session.commit()
         await session.refresh(category)
         return category
+
+    @staticmethod
+    async def get_all(session: AsyncSession):
+        stmt = select(Category).order_by(Category.id)
+        result = await session.scalars(stmt)
+        return result.all()
+
+    @staticmethod
+    async def get_by_id(session: AsyncSession, category_id: int):
+        return await session.get(Category, category_id)
+
+    @staticmethod
+    async def delete(session: AsyncSession, category: Category):
+        await session.delete(category)
+        await session.commit()
