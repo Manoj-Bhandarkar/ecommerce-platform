@@ -5,7 +5,7 @@ from src.api.user import router as account_router
 from src.api.auth import router as auth_router
 from src.api.admin import router as admin_router
 from src.api.categories import router as category_router
-
+from src.api.product import router as product_router
 app = FastAPI(title=settings.PROJECT_NAME)
 
 app.add_middleware(
@@ -27,4 +27,5 @@ app.include_router(
 )
 app.include_router(auth_router, prefix=f"{settings.API_PREFIX}/auth", tags=["Auth"])
 app.include_router(admin_router, prefix=f"{settings.API_PREFIX}/admin", tags=["Admin"])
-app.include_router(category_router, prefix="/api/v1/categories", tags=["Categories"])
+app.include_router(category_router, prefix=f"{settings.API_PREFIX}categories", tags=["Categories"])
+app.include_router(product_router, prefix=f"{settings.API_PREFIX}/product", tags=["Products"])

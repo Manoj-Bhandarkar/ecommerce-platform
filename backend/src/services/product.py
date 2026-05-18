@@ -9,6 +9,7 @@ from src.models.product import Product
 from src.utils.file import save_upload_file
 from src.utils.slug import generate_slug
 
+
 async def generate_unique_slug(
     session: AsyncSession,
     title: str,
@@ -26,6 +27,7 @@ async def generate_unique_slug(
 
     return slug
 
+
 async def create_product(
     session: AsyncSession, data: ProductCreate, image: UploadFile | None
 ) -> Product:
@@ -39,7 +41,7 @@ async def create_product(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="SKU already exists",
         )
-    
+
     image_path = await save_upload_file(image, "products")
     categories = []
     if data.category_ids:
@@ -49,7 +51,7 @@ async def create_product(
         )
     product_data = data.model_dump(exclude={"category_ids"})
 
-    product_data["slug"] = generate_unique_slug(product_data["title"])
+    product_data["slug"] = await generate_unique_slug(session, product_data["title"])
 
     product = await ProductRepository.create(
         session=session,
