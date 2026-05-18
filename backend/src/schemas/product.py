@@ -12,7 +12,7 @@ class ProductBase(BaseModel):
 
 class ProductCreate(ProductBase):
     sku: str
-    category_ids: list[int] | None = []
+    category_ids: list[int] = Field(default_factory=list)
 
 
 class ProductOut(ProductBase):
@@ -20,5 +20,5 @@ class ProductOut(ProductBase):
     slug: str
     sku: str
     image_url: str | None
-    categories: list[CategoryOut] = []
+    categories: list[CategoryOut]  = Field(default_factory=list)
     model_config = {"from_attributes": True}

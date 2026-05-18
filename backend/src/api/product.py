@@ -5,6 +5,7 @@ from src.models.user import User
 from src.schemas.product import ProductCreate, ProductOut
 from src.services.product import create_product
 from src.dependencies.auth import require_admin
+from decimal import Decimal
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ async def product_create(
     title: str = Form(...),
     description: str | None = Form(None),
     sku: str = Form(...),
-    price: float = Form(...),
+    price: Decimal = Form(...),
     stock_quantity: int = Form(...),
     category_ids: Annotated[list[int], Form()] = [],
     image: UploadFile | None = File(None),
