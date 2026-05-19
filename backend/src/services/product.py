@@ -35,13 +35,11 @@ async def create_product(
         session=session,
         sku=data.sku,
     )
-
     if existing_product:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="SKU already exists",
         )
-
     image_path = await save_upload_file(image, "products")
     categories = []
     if data.category_ids:
@@ -50,9 +48,7 @@ async def create_product(
             category_ids=data.category_ids,
         )
     product_data = data.model_dump(exclude={"category_ids"})
-
     product_data["slug"] = await generate_unique_slug(session, product_data["title"])
-
     product = await ProductRepository.create(
         session=session,
         product_data=product_data,
@@ -61,3 +57,24 @@ async def create_product(
     )
 
     return product
+
+
+async def get_all_products(
+    session: AsyncSession,
+    category_names: list[str] | None,
+    limit: int,
+    page: int,
+):
+    offset = (page - 1) * limit
+    total, products = await ProductRepository.get_all(
+        session=session,
+        category_names=category_names,
+        limit=limit,
+        offset=offset,
+    )
+    return {
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "items": products,
+    }

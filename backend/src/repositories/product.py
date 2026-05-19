@@ -1,6 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.product import Product
-from sqlalchemy import select
+from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
+from src.models.category import Category
+
 
 class ProductRepository:
     @staticmethod
@@ -12,7 +15,7 @@ class ProductRepository:
     async def get_by_slug(session: AsyncSession, slug: str):
         stmt = select(Product).where(Product.slug == slug)
         return await session.scalar(stmt)
-    
+
     @staticmethod
     async def create(
         session: AsyncSession,
@@ -25,3 +28,26 @@ class ProductRepository:
         await session.commit()
         await session.refresh(product, attribute_names=["categories"])
         return product
+
+    @staticmethod
+    async def get_all(
+        session: AsyncSession,
+        category_names: list[str] | None,
+        limit: int,
+        offset: int,
+    ):
+        stmt = select(Product).options(selectinload(Product.categories))
+
+        if category_names:
+            stmt = (
+                stmt.join(Product.categories)
+                .where(Category.name.in_(category_names))
+                .distinct()
+            )
+
+        count_stmt = select(func.count()).select_from(stmt.subquery())
+        total = await session.scalar(count_stmt)
+        stmt = stmt.limit(limit).offset(offset)
+        result = await session.execute(stmt)
+        products = result.scalars().unique().all()
+        return total, products

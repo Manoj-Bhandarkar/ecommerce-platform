@@ -20,5 +20,12 @@ class ProductOut(ProductBase):
     slug: str
     sku: str
     image_url: str | None
-    categories: list[CategoryOut]  = Field(default_factory=list)
+    categories: list[CategoryOut] = Field(default_factory=list)
     model_config = {"from_attributes": True}
+
+
+class PaginatedProductOut(BaseModel):
+    total: int
+    page: int
+    limit: int
+    items: list[ProductOut]
