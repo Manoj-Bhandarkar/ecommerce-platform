@@ -1,7 +1,4 @@
-from unittest import result
-
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.src.utils import slug
 from src.models.product import Product
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
