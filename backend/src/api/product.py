@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
 from src.core.database import SessionDep
 from src.models.user import User
 from src.schemas.product import ProductCreate, ProductOut, PaginatedProductOut
-from src.services.product import create_product, get_all_products
+from src.services.product import create_product, get_all_products, get_product_by_slug
 from src.dependencies.auth import require_admin
 from decimal import Decimal
 
@@ -34,6 +34,7 @@ async def product_create(
 
     return await create_product(session=session, data=data, image=image)
 
+
 @router.get("", response_model=PaginatedProductOut)
 async def list_products(
     session: SessionDep,
@@ -42,3 +43,8 @@ async def list_products(
     page: int = Query(default=1, ge=1),
 ):
     return await get_all_products(session, categories, limit, page)
+
+
+@router.get("/{slug}", response_model=ProductOut)
+async def product_get_by_slug(session: SessionDep, slug: str):
+    return await get_product_by_slug(session=session, slug=slug)

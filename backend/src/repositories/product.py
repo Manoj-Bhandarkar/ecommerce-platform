@@ -1,4 +1,7 @@
+from unittest import result
+
 from sqlalchemy.ext.asyncio import AsyncSession
+from backend.src.utils import slug
 from src.models.product import Product
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
@@ -12,9 +15,10 @@ class ProductRepository:
         return await session.scalar(stmt)
 
     @staticmethod
-    async def get_by_slug(session: AsyncSession, slug: str):
-        stmt = select(Product).where(Product.slug == slug)
-        return await session.scalar(stmt)
+    async def slug_exists(session: AsyncSession, slug: str) -> bool:
+        stmt = select(Product.id).where(Product.slug == slug)
+        result = await session.scalar(stmt)
+        return result is not None
 
     @staticmethod
     async def create(
@@ -37,17 +41,25 @@ class ProductRepository:
         offset: int,
     ):
         stmt = select(Product).options(selectinload(Product.categories))
-
         if category_names:
             stmt = (
                 stmt.join(Product.categories)
                 .where(Category.name.in_(category_names))
                 .distinct()
             )
-
         count_stmt = select(func.count()).select_from(stmt.subquery())
         total = await session.scalar(count_stmt)
         stmt = stmt.limit(limit).offset(offset)
         result = await session.execute(stmt)
         products = result.scalars().unique().all()
         return total, products
+
+    @staticmethod
+    async def get_by_slug(session: AsyncSession, slug: str) -> Product | None:
+        stmt = (
+            select(Product)
+            .options(selectinload(Product.categories))
+            .where(Product.slug == slug)
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()

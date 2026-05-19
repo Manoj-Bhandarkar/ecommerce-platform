@@ -10,18 +10,11 @@ from src.utils.file import save_upload_file
 from src.utils.slug import generate_slug
 
 
-async def generate_unique_slug(
-    session: AsyncSession,
-    title: str,
-):
+async def generate_unique_slug(session: AsyncSession, title: str):
     base_slug = generate_slug(title)
     slug = base_slug
     counter = 1
-
-    while await ProductRepository.get_by_slug(
-        session=session,
-        slug=slug,
-    ):
+    while await ProductRepository.slug_exists(session, slug):
         slug = f"{base_slug}-{counter}"
         counter += 1
 
@@ -31,10 +24,7 @@ async def generate_unique_slug(
 async def create_product(
     session: AsyncSession, data: ProductCreate, image: UploadFile | None
 ) -> Product:
-    existing_product = await ProductRepository.get_by_sku(
-        session=session,
-        sku=data.sku,
-    )
+    existing_product = await ProductRepository.get_by_sku(session=session, sku=data.sku)
     if existing_product:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -55,22 +45,15 @@ async def create_product(
         image_url=image_path,
         categories=categories,
     )
-
     return product
 
 
 async def get_all_products(
-    session: AsyncSession,
-    category_names: list[str] | None,
-    limit: int,
-    page: int,
+    session: AsyncSession, category_names: list[str] | None, limit: int, page: int
 ):
     offset = (page - 1) * limit
     total, products = await ProductRepository.get_all(
-        session=session,
-        category_names=category_names,
-        limit=limit,
-        offset=offset,
+        session=session, category_names=category_names, limit=limit, offset=offset
     )
     return {
         "total": total,
@@ -78,3 +61,13 @@ async def get_all_products(
         "limit": limit,
         "items": products,
     }
+
+
+async def get_product_by_slug(session: AsyncSession, slug: str):
+    product = await ProductRepository.get_by_slug(session=session, slug=slug)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
+    return product
