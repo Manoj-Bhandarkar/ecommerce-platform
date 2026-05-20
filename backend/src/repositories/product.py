@@ -61,8 +61,6 @@ class ProductRepository:
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
-
-
     @staticmethod
     async def search(
         session: AsyncSession,
@@ -76,7 +74,11 @@ class ProductRepository:
     ):
         stmt = select(Product).options(selectinload(Product.categories))
         if category_names:
-            stmt = (stmt.join(Product.categories).where(Category.name.in_(category_names)).distinct())
+            stmt = (
+                stmt.join(Product.categories)
+                .where(Category.name.in_(category_names))
+                .distinct()
+            )
         filters = []
 
         if title:
@@ -96,3 +98,19 @@ class ProductRepository:
         result = await session.execute(stmt)
         products = result.scalars().unique().all()
         return total, products
+
+    @staticmethod
+    async def get_by_id(session: AsyncSession, product_id: int) -> Product | None:
+        stmt = (
+            select(Product)
+            .options(selectinload(Product.categories))
+            .where(Product.id == product_id)
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def save(session: AsyncSession, product: Product) -> Product:
+        await session.commit()
+        await session.refresh(product)
+        return product

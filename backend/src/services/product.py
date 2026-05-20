@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.repositories.product import ProductRepository
 from src.repositories.category import CategoryRepository
-from src.schemas.product import ProductCreate
+from src.schemas.product import ProductCreate, ProductUpdate
 from src.models.product import Product
 
 from src.utils.file import save_upload_file
@@ -109,3 +109,69 @@ async def search_products(
         "limit": limit,
         "items": products,
     }
+
+
+async def update_product_by_id(
+    session: AsyncSession,
+    product_id: int,
+    data: ProductUpdate,
+    image: UploadFile | None,
+) -> Product:
+
+    product = await ProductRepository.get_by_id(
+        session=session,
+        product_id=product_id,
+    )
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
+
+    # VALIDATE PRICE
+    if data.price is not None and data.price <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Price must be greater than 0",
+        )
+
+    # VALIDATE STOCK
+    if data.stock_quantity is not None and data.stock_quantity < 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Stock cannot be negative",
+        )
+
+    # UPDATE CATEGORIES
+    if data.category_ids is not None:
+        categories = await CategoryRepository.get_by_ids(
+            session=session,
+            category_ids=data.category_ids,
+        )
+        if len(categories) != len(data.category_ids):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="One or more categories not found",
+            )
+        product.categories = categories
+
+    # UPDATE NORMAL FIELDS
+    update_data = data.model_dump(
+        exclude={"category_ids"},
+        exclude_none=True,
+    )
+
+    for key, value in update_data.items():
+        setattr(product, key, value)
+
+    # UPDATE SLUG
+    if data.title:
+        product.slug = generate_slug(data.title)
+
+    # IMAGE UPDATE
+    if image:
+        image_path = await save_upload_file(image, "products")
+        product.image_url = image_path
+
+    return await ProductRepository.save(session=session, product=product)

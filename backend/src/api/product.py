@@ -2,12 +2,18 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
 from src.core.database import SessionDep
 from src.models.user import User
-from src.schemas.product import ProductCreate, ProductOut, PaginatedProductOut
+from src.schemas.product import (
+    ProductCreate,
+    ProductOut,
+    PaginatedProductOut,
+    ProductUpdate,
+)
 from src.services.product import (
     create_product,
     get_all_products,
     get_product_by_slug,
     search_products,
+    update_product_by_id,
 )
 from src.dependencies.auth import require_admin
 from decimal import Decimal
@@ -75,4 +81,33 @@ async def products_search(
         max_price=max_price,
         limit=limit,
         page=page,
+    )
+
+
+@router.patch("/{product_id}", response_model=ProductOut)
+async def product_update_by_id_route(
+    session: SessionDep,
+    product_id: int,
+    title: str | None = Form(None),
+    description: str | None = Form(None),
+    price: float | None = Form(None),
+    stock_quantity: int | None = Form(None),
+    category_ids: Annotated[list[int] | None, Form()] = None,
+    image: UploadFile | None = File(None),
+    _: User = Depends(require_admin),
+):
+
+    data = ProductUpdate(
+        title=title,
+        description=description,
+        price=price,
+        stock_quantity=stock_quantity,
+        category_ids=category_ids,
+    )
+
+    return await update_product_by_id(
+        session=session,
+        product_id=product_id,
+        data=data,
+        image=image,
     )
