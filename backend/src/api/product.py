@@ -1,5 +1,14 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    Query,
+    UploadFile,
+    status,
+    HTTPException,
+)
 from src.core.database import SessionDep
 from src.models.user import User
 from src.schemas.product import (
@@ -14,6 +23,7 @@ from src.services.product import (
     get_product_by_slug,
     search_products,
     update_product_by_id,
+    delete_product,
 )
 from src.dependencies.auth import require_admin
 from decimal import Decimal
@@ -111,3 +121,20 @@ async def product_update_by_id_route(
         data=data,
         image=image,
     )
+
+
+# src/api/product.py
+
+
+@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def product_delete(
+    session: SessionDep, product_id: int, _: User = Depends(require_admin)
+):
+
+    success = await delete_product(session=session, product_id=product_id)
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )

@@ -175,3 +175,11 @@ async def update_product_by_id(
         product.image_url = image_path
 
     return await ProductRepository.save(session=session, product=product)
+
+
+async def delete_product(session: AsyncSession, product_id: int) -> bool:
+    product = await ProductRepository.get_by_id(session=session, product_id=product_id)
+    if not product:
+        return False
+    await ProductRepository.delete(session=session, product=product)
+    return True
