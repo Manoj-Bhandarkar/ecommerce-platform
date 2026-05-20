@@ -3,7 +3,12 @@ from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
 from src.core.database import SessionDep
 from src.models.user import User
 from src.schemas.product import ProductCreate, ProductOut, PaginatedProductOut
-from src.services.product import create_product, get_all_products, get_product_by_slug
+from src.services.product import (
+    create_product,
+    get_all_products,
+    get_product_by_slug,
+    search_products,
+)
 from src.dependencies.auth import require_admin
 from decimal import Decimal
 
@@ -45,6 +50,29 @@ async def list_products(
     return await get_all_products(session, categories, limit, page)
 
 
-@router.get("/{slug}", response_model=ProductOut)
+@router.get("/{slug:re:^(?!search$)[a-z0-9-]+$}", response_model=ProductOut)
 async def product_get_by_slug(session: SessionDep, slug: str):
     return await get_product_by_slug(session=session, slug=slug)
+
+
+@router.get("/search/", response_model=PaginatedProductOut)
+async def products_search(
+    session: SessionDep,
+    categories: list[str] | None = Query(default=None),
+    title: str | None = Query(None),
+    description: str | None = Query(None),
+    min_price: float | None = Query(None),
+    max_price: float | None = Query(None),
+    limit: int = Query(default=5, ge=1, le=100),
+    page: int = Query(default=1, ge=1),
+):
+    return await search_products(
+        session=session,
+        category_names=categories,
+        title=title,
+        description=description,
+        min_price=min_price,
+        max_price=max_price,
+        limit=limit,
+        page=page,
+    )

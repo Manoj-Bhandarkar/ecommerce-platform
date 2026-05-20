@@ -71,3 +71,41 @@ async def get_product_by_slug(session: AsyncSession, slug: str):
             detail="Product not found",
         )
     return product
+
+
+async def search_products(
+    session: AsyncSession,
+    category_names: list[str] | None,
+    title: str | None,
+    description: str | None,
+    min_price: float | None,
+    max_price: float | None,
+    limit: int,
+    page: int,
+):
+
+    if min_price is not None and max_price is not None and min_price > max_price:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="min_price cannot be greater than max_price",
+        )
+
+    offset = (page - 1) * limit
+
+    total, products = await ProductRepository.search(
+        session=session,
+        category_names=category_names,
+        title=title,
+        description=description,
+        min_price=min_price,
+        max_price=max_price,
+        limit=limit,
+        offset=offset,
+    )
+
+    return {
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "items": products,
+    }
