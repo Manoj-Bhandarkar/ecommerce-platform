@@ -66,11 +66,6 @@ async def list_products(
     return await get_all_products(session, categories, limit, page)
 
 
-@router.get("/{slug:re:^(?!search$)[a-z0-9-]+$}", response_model=ProductOut)
-async def product_get_by_slug(session: SessionDep, slug: str):
-    return await get_product_by_slug(session=session, slug=slug)
-
-
 @router.get("/search/", response_model=PaginatedProductOut)
 async def products_search(
     session: SessionDep,
@@ -92,6 +87,11 @@ async def products_search(
         limit=limit,
         page=page,
     )
+
+
+@router.get("/{slug}", response_model=ProductOut)
+async def product_get_by_slug(session: SessionDep, slug: str):
+    return await get_product_by_slug(session=session, slug=slug)
 
 
 @router.patch("/{product_id}", response_model=ProductOut)
@@ -121,10 +121,6 @@ async def product_update_by_id_route(
         data=data,
         image=image,
     )
-
-
-# src/api/product.py
-
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def product_delete(

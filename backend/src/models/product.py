@@ -10,7 +10,7 @@ from src.models.common import TimestampMixin
 
 if TYPE_CHECKING:
     from src.models.category import Category
-
+    from src.models.cart_item import CartItem
 
 class Product(TimestampMixin, Base):
     __tablename__ = "products"
@@ -36,4 +36,8 @@ class Product(TimestampMixin, Base):
         "src.models.category.Category",
         secondary=product_category_table,
         back_populates="products",
+    )
+
+    cart_items: Mapped[list["CartItem"]] = relationship(
+        "CartItem", back_populates="product"
     )
