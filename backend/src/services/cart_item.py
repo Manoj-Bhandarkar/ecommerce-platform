@@ -1,11 +1,10 @@
 from decimal import Decimal
 from uuid import UUID
-from fastapi import HTTPException
-from sqlalchemy import select
+from fastapi import HTTPException, status
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.product import Product
-from src.models.cart_item import CartItem
 from src.schemas.cart_item import CartItemCreate, CartItemOut, CartSummary
 from src.repositories.cart_item import CartRepository
 
@@ -99,4 +98,81 @@ async def list_user_cart(
         items=cart_data,
         total_quantity=total_quantity,
         total_price=total_price,
+    )
+
+
+async def change_cart_item_quantity_by_product(
+    session: AsyncSession,
+    product_id: int,
+    user_id: int,
+    delta: int,
+):
+    product = await session.get(Product, product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
+    item = await CartRepository.get_cart_item(
+        session=session,
+        user_id=user_id,
+        product_id=product_id,
+    )
+    if not item:
+        if delta < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Item not in cart",
+            )
+        if product.stock_quantity < 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Insufficient stock",
+            )
+        item = await CartRepository.create_cart_item(
+            session=session,
+            user_id=user_id,
+            product_id=product_id,
+            quantity=1,
+            price=product.price,
+        )
+        return CartItemOut(
+            id=item.id,
+            product_id=item.product_id,
+            user_id=user_id,
+            product_title=product.title,
+            product_slug=product.slug,
+            product_image=product.image_url,
+            quantity=item.quantity,
+            price=item.price,
+            total=item.price * item.quantity,
+        )
+
+    # Existing item
+    new_quantity = item.quantity + delta
+    if new_quantity <= 0:
+        await CartRepository.delete_cart_item(
+            session=session,
+            item=item,
+        )
+        return {"message": "Item removed from cart"}
+    if new_quantity > product.stock_quantity:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Insufficient stock",
+        )
+    item.quantity = new_quantity
+    item.price = product.price
+    await CartRepository.save(session, item)
+
+    return CartItemOut(
+        id=item.id,
+        product_id=item.product_id,
+        user_id=user_id,
+        product_title=product.title,
+        product_slug=product.slug,
+        product_image=product.image_url,
+        quantity=item.quantity,
+        price=item.price,
+        total=item.price * item.quantity,
     )

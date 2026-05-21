@@ -28,3 +28,6 @@ class CartSummary(BaseModel):
     items: list[CartItemOut]
     total_quantity: int
     total_price: Decimal
+
+class CartMessage(BaseModel):
+    message: str

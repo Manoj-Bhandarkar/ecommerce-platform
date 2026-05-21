@@ -56,3 +56,19 @@ class CartRepository:
         await session.refresh(item)
 
         return item
+
+    @staticmethod
+    async def delete_cart_item(
+        session: AsyncSession,
+        item: CartItem,
+    ) -> None:
+        await session.delete(item)
+        await session.commit()
+
+    @staticmethod
+    async def save(
+        session: AsyncSession,
+        item: CartItem,
+    ) -> None:
+        await session.commit()
+        await session.refresh(item)
