@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.shipping_address import ShippingAddressRepository
 from src.schemas.shipping_address import ShippingAddressCreate, ShippingAddressOut
@@ -16,3 +18,16 @@ async def create_shipping_address(
     await ShippingAddressRepository.save(session)
     await session.refresh(address)
     return ShippingAddressOut.model_validate(address)
+
+
+async def list_user_shipping_addresses(
+    session: AsyncSession,
+    user_id: UUID,
+) -> list[ShippingAddressOut]:
+
+    addresses = await ShippingAddressRepository.get_user_addresses(
+        session=session,
+        user_id=user_id,
+    )
+
+    return [ShippingAddressOut.model_validate(address) for address in addresses]

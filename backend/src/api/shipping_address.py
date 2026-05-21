@@ -3,7 +3,10 @@ from src.core.database import SessionDep
 from src.models.user import User
 from src.dependencies.current_user import get_current_user
 from src.schemas.shipping_address import ShippingAddressOut, ShippingAddressCreate
-from src.services.shipping_address import create_shipping_address
+from src.services.shipping_address import (
+    create_shipping_address,
+    list_user_shipping_addresses,
+)
 
 router = APIRouter()
 
@@ -18,4 +21,15 @@ async def shipping_address_create(
         session=session,
         user_id=user.id,
         data=data,
+    )
+
+
+@router.get("/addresses", response_model=list[ShippingAddressOut])
+async def shipping_addresses_user_list(
+    session: SessionDep,
+    user: User = Depends(get_current_user),
+):
+    return await list_user_shipping_addresses(
+        session=session,
+        user_id=user.id,
     )
