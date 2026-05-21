@@ -1,9 +1,7 @@
 from decimal import Decimal
 from uuid import UUID
 from fastapi import HTTPException, status
-
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.models.product import Product
 from src.schemas.cart_item import CartItemCreate, CartItemOut, CartSummary
 from src.repositories.cart_item import CartRepository
@@ -176,3 +174,22 @@ async def change_cart_item_quantity_by_product(
         price=item.price,
         total=item.price * item.quantity,
     )
+
+
+async def delete_cart_item(
+    session: AsyncSession,
+    cart_item_id: int,
+    user_id: int,
+):
+    item = await CartRepository.get_cart_item_by_id(
+        session=session,
+        cart_item_id=cart_item_id,
+        user_id=user_id,
+    )
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Item not found",
+        )
+    await CartRepository.delete_cart_item(session=session, item=item)
+    await CartRepository.commit(session)

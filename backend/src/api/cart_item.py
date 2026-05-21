@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from src.core.database import SessionDep
 from src.dependencies.current_user import get_current_user
@@ -7,6 +7,7 @@ from src.schemas.cart_item import CartItemCreate, CartItemOut, CartMessage, Cart
 from src.services.cart_item import (
     add_to_cart,
     change_cart_item_quantity_by_product,
+    delete_cart_item,
     list_user_cart,
 )
 
@@ -52,4 +53,20 @@ async def decrease_quantity_by_product(
         product_id=product_id,
         user_id=user.id,
         delta=-1,
+    )
+
+
+@router.delete(
+    "/delete/{item_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def cart_item_delete(
+    session: SessionDep,
+    item_id: int,
+    user: User = Depends(get_current_user),
+):
+    await delete_cart_item(
+        session=session,
+        cart_item_id=item_id,
+        user_id=user.id,
     )

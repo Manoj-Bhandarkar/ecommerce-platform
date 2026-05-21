@@ -72,3 +72,20 @@ class CartRepository:
     ) -> None:
         await session.commit()
         await session.refresh(item)
+
+    @staticmethod
+    async def get_cart_item_by_id(
+        session: AsyncSession,
+        cart_item_id: int,
+        user_id: int,
+    ) -> CartItem | None:
+        stmt = select(CartItem).where(
+            CartItem.id == cart_item_id,
+            CartItem.user_id == user_id,
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def commit(session: AsyncSession) -> None:
+        await session.commit()
