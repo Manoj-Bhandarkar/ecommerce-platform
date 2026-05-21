@@ -13,7 +13,7 @@ from src.repositories.cart_item import CartRepository
 async def add_to_cart(
     session: AsyncSession,
     data: CartItemCreate,
-    user_id: int,
+    user_id: UUID,
 ):
     product = await session.get(Product, data.product_id)
     if not product:
@@ -55,6 +55,8 @@ async def add_to_cart(
         user_id=item.user_id,
         product_id=item.product_id,
         product_title=product.title,
+        product_slug=product.slug, 
+        product_image=product.image_url,
         quantity=item.quantity,
         price=item.price,
         total=item.price * item.quantity,
@@ -85,6 +87,7 @@ async def list_user_cart(
         cart_data.append(
             CartItemOut(
                 id=item.id,
+                user_id=user_id,
                 product_id=item.product.id,
                 product_title=item.product.title,
                 product_slug=item.product.slug,

@@ -1,4 +1,5 @@
 from decimal import Decimal
+from uuid import UUID
 from pydantic import BaseModel
 
 
@@ -13,9 +14,10 @@ class CartItemCreate(CartItemBase):
 
 class CartItemOut(BaseModel):
     id: int
+    user_id: UUID
     product_id: int
     product_title: str
-    product_slug: str
+    product_slug: str | None
     product_image: str | None
     quantity: int
     price: Decimal
