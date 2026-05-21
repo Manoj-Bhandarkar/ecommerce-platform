@@ -1,5 +1,3 @@
-
-
 from sqlalchemy import UUID, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.shipping_address import ShippingAddress
@@ -34,3 +32,16 @@ class ShippingAddressRepository:
         )
         result = await session.execute(stmt)
         return result.scalars().all()
+
+    @staticmethod
+    async def get_user_address_by_id(
+        session: AsyncSession,
+        address_id: int,
+        user_id: UUID,
+    ) -> ShippingAddress | None:
+        stmt = select(ShippingAddress).where(
+            ShippingAddress.id == address_id,
+            ShippingAddress.user_id == user_id,
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()

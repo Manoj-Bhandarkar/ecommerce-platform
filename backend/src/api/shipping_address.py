@@ -5,13 +5,14 @@ from src.dependencies.current_user import get_current_user
 from src.schemas.shipping_address import ShippingAddressOut, ShippingAddressCreate
 from src.services.shipping_address import (
     create_shipping_address,
+    get_user_shipping_address_by_address_id,
     list_user_shipping_addresses,
 )
 
 router = APIRouter()
 
 
-@router.post("/addresses", response_model=ShippingAddressOut)
+@router.post("/address", response_model=ShippingAddressOut)
 async def shipping_address_create(
     session: SessionDep,
     data: ShippingAddressCreate,
@@ -24,12 +25,25 @@ async def shipping_address_create(
     )
 
 
-@router.get("/addresses", response_model=list[ShippingAddressOut])
+@router.get("/address", response_model=list[ShippingAddressOut])
 async def shipping_addresses_user_list(
     session: SessionDep,
     user: User = Depends(get_current_user),
 ):
     return await list_user_shipping_addresses(
         session=session,
+        user_id=user.id,
+    )
+
+
+@router.get("/address/{address_id}", response_model=ShippingAddressOut)
+async def shipping_address_user_by_address_id(
+    session: SessionDep,
+    address_id: int,
+    user: User = Depends(get_current_user),
+):
+    return await get_user_shipping_address_by_address_id(
+        session=session,
+        address_id=address_id,
         user_id=user.id,
     )

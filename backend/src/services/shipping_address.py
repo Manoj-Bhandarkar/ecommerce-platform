@@ -1,8 +1,10 @@
+import select
 from uuid import UUID
-
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.repositories.shipping_address import ShippingAddressRepository
 from src.schemas.shipping_address import ShippingAddressCreate, ShippingAddressOut
+
 
 
 async def create_shipping_address(
@@ -24,10 +26,26 @@ async def list_user_shipping_addresses(
     session: AsyncSession,
     user_id: UUID,
 ) -> list[ShippingAddressOut]:
-
     addresses = await ShippingAddressRepository.get_user_addresses(
         session=session,
         user_id=user_id,
     )
-
     return [ShippingAddressOut.model_validate(address) for address in addresses]
+
+
+async def get_user_shipping_address_by_address_id(
+    session: AsyncSession,
+    address_id: int,
+    user_id: UUID,
+) -> ShippingAddressOut:
+    address = await ShippingAddressRepository.get_user_address_by_id(
+        session=session,
+        address_id=address_id,
+        user_id=user_id,
+    )
+    if not address:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Address not found",
+        )
+    return ShippingAddressOut.model_validate(address)
