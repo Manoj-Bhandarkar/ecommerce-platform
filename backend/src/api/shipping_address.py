@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from src.core.database import SessionDep
 from src.models.user import User
 from src.dependencies.current_user import get_current_user
@@ -9,6 +9,7 @@ from src.schemas.shipping_address import (
 )
 from src.services.shipping_address import (
     create_shipping_address,
+    delete_shipping_address_by_address_id,
     get_user_shipping_address_by_address_id,
     list_user_shipping_addresses,
     update_user_shipping_address_by_address_id,
@@ -69,4 +70,19 @@ async def user_shipping_address_update_by_address_id(
         address_id=address_id,
         user_id=user.id,
         data=data,
+    )
+
+@router.delete(
+    "/addresses/{address_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def shipping_address_delete_by_address_id(
+    session: SessionDep,
+    address_id: int,
+    user: User = Depends(get_current_user),
+):
+    await delete_shipping_address_by_address_id(
+        session=session,
+        user_id=user.id,
+        address_id=address_id,
     )

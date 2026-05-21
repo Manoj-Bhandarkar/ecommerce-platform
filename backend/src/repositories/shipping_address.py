@@ -45,3 +45,11 @@ class ShippingAddressRepository:
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
+
+    @staticmethod
+    async def delete(
+        session: AsyncSession,
+        address: ShippingAddress,
+    ) -> None:
+
+        await session.delete(address)

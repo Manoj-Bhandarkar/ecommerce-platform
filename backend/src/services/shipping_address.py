@@ -79,3 +79,22 @@ async def update_user_shipping_address_by_address_id(
     await ShippingAddressRepository.save(session)
     await session.refresh(address)
     return ShippingAddressOut.model_validate(address)
+
+
+async def delete_shipping_address_by_address_id(
+    session: AsyncSession,
+    user_id: UUID,
+    address_id: int,
+) -> None:
+    address = await ShippingAddressRepository.get_user_address_by_id(
+        session=session,
+        address_id=address_id,
+        user_id=user_id,
+    )
+    if not address:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Address not found",
+        )
+    await ShippingAddressRepository.delete(session=session, address=address)
+    await ShippingAddressRepository.save(session)
