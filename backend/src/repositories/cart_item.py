@@ -19,3 +19,40 @@ class CartRepository:
         )
         result = await session.execute(stmt)
         return result.scalars().all()
+
+    @staticmethod
+    async def get_cart_item(
+        session: AsyncSession,
+        user_id: UUID,
+        product_id: UUID,
+    ) -> CartItem | None:
+
+        stmt = select(CartItem).where(
+            CartItem.user_id == user_id,
+            CartItem.product_id == product_id,
+        )
+
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def create_cart_item(
+        session: AsyncSession,
+        user_id: UUID,
+        product_id: UUID,
+        quantity: int,
+        price,
+    ) -> CartItem:
+
+        item = CartItem(
+            user_id=user_id,
+            product_id=product_id,
+            quantity=quantity,
+            price=price,
+        )
+
+        session.add(item)
+        await session.commit()
+        await session.refresh(item)
+
+        return item

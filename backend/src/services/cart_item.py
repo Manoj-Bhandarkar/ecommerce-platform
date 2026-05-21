@@ -21,13 +21,11 @@ async def add_to_cart(
             status_code=404,
             detail="Product not found",
         )
-    stmt = select(CartItem).where(
-        CartItem.user_id == user_id,
-        CartItem.product_id == data.product_id,
+    item = await CartRepository.get_cart_item(
+        session=session,
+        user_id=user_id,
+        product_id=data.product_id,
     )
-    result = await session.execute(stmt)
-    item = result.scalar_one_or_none()
-
     new_quantity = data.quantity
     if item:
         new_quantity = item.quantity + data.quantity
@@ -41,21 +39,20 @@ async def add_to_cart(
         item.quantity = new_quantity
         item.price = product.price
     else:
-        item = CartItem(
+        item = await CartRepository.create_cart_item(
+            session=session,
             user_id=user_id,
             product_id=data.product_id,
             quantity=data.quantity,
             price=product.price,
         )
-        session.add(item)
-    await session.commit()
-    await session.refresh(item)
+
     return CartItemOut(
         id=item.id,
         user_id=item.user_id,
         product_id=item.product_id,
         product_title=product.title,
-        product_slug=product.slug, 
+        product_slug=product.slug,
         product_image=product.image_url,
         quantity=item.quantity,
         price=item.price,
