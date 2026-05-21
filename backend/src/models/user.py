@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Boolean
+from src.models.shipping_address import ShippingAddress
 from src.db.base import Base
 from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
@@ -33,4 +34,7 @@ class User(TimestampMixin, Base):
 
     cart_items: Mapped[list["CartItem"]] = relationship(
         "CartItem", back_populates="user", cascade="all, delete-orphan"
+    )
+    shipping_addresses: Mapped[list["ShippingAddress"]] = relationship(
+        "ShippingAddress", back_populates="user", cascade="all, delete-orphan"
     )
