@@ -2,11 +2,16 @@ from fastapi import APIRouter, Depends
 from src.core.database import SessionDep
 from src.models.user import User
 from src.dependencies.current_user import get_current_user
-from src.schemas.shipping_address import ShippingAddressOut, ShippingAddressCreate
+from src.schemas.shipping_address import (
+    ShippingAddressOut,
+    ShippingAddressCreate,
+    ShippingAddressUpdate,
+)
 from src.services.shipping_address import (
     create_shipping_address,
     get_user_shipping_address_by_address_id,
     list_user_shipping_addresses,
+    update_user_shipping_address_by_address_id,
 )
 
 router = APIRouter()
@@ -46,4 +51,22 @@ async def shipping_address_user_by_address_id(
         session=session,
         address_id=address_id,
         user_id=user.id,
+    )
+
+
+@router.patch(
+    "/addresses/{address_id}",
+    response_model=ShippingAddressOut,
+)
+async def user_shipping_address_update_by_address_id(
+    session: SessionDep,
+    address_id: int,
+    data: ShippingAddressUpdate,
+    user: User = Depends(get_current_user),
+):
+    return await update_user_shipping_address_by_address_id(
+        session=session,
+        address_id=address_id,
+        user_id=user.id,
+        data=data,
     )
