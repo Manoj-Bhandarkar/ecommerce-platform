@@ -1,13 +1,8 @@
 from decimal import Decimal
-from sqlalchemy import (
-    UUID,
-    ForeignKey,
-    Numeric,
-    UniqueConstraint,
-)
+from sqlalchemy import ForeignKey, Numeric, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models.common import TimestampMixin
-
+from uuid import UUID
 from src.models.product import Product
 from src.models.user import User
 from src.db.base import Base
@@ -35,7 +30,6 @@ class CartItem(TimestampMixin, Base):
     )
     quantity: Mapped[int] = mapped_column(default=1)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-
 
     user: Mapped["User"] = relationship("User", back_populates="cart_items")
     product: Mapped["Product"] = relationship("Product", back_populates="cart_items")

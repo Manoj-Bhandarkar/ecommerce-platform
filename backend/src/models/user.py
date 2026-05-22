@@ -1,17 +1,18 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Boolean
+from src.models.order import Order
 from src.models.shipping_address import ShippingAddress
 from src.db.base import Base
 from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
 from src.models.common import TimestampMixin
 from uuid import UUID as PyUUID
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.models.refresh_token import RefreshToken
     from src.models.cart_item import CartItem
+    from src.models.payment import Payment
 
 
 class User(TimestampMixin, Base):
@@ -31,10 +32,19 @@ class User(TimestampMixin, Base):
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         "RefreshToken", back_populates="user", cascade="all, delete-orphan"
     )
-
     cart_items: Mapped[list["CartItem"]] = relationship(
         "CartItem", back_populates="user", cascade="all, delete-orphan"
     )
     shipping_addresses: Mapped[list["ShippingAddress"]] = relationship(
         "ShippingAddress", back_populates="user", cascade="all, delete-orphan"
+    )
+    orders: Mapped[list["Order"]] = relationship(
+        "Order",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    payments: Mapped[list["Payment"]] = relationship(
+        "Payment",
+        back_populates="user",
+        cascade="all, delete-orphan",
     )

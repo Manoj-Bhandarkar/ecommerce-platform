@@ -1,16 +1,16 @@
 from decimal import Decimal
-from typing import TYPE_CHECKING
-
 from sqlalchemy import String, Numeric, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from src.db.base import Base
-from src.models.product_category import product_category_table
 from src.models.common import TimestampMixin
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.models.category import Category
     from src.models.cart_item import CartItem
+    from src.models.order_item import OrderItem
+    from src.models.product_category import product_category_table
+
 
 class Product(TimestampMixin, Base):
     __tablename__ = "products"
@@ -37,7 +37,10 @@ class Product(TimestampMixin, Base):
         secondary=product_category_table,
         back_populates="products",
     )
-
     cart_items: Mapped[list["CartItem"]] = relationship(
         "CartItem", back_populates="product"
+    )
+    order_items: Mapped[list["OrderItem"]] = relationship(
+        "OrderItem",
+        back_populates="product",
     )
