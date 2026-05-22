@@ -34,7 +34,7 @@ class Product(TimestampMixin, Base):
 
     categories: Mapped[list["Category"]] = relationship(
         "src.models.category.Category",
-        secondary=product_category_table,
+        secondary="product_category_table",
         back_populates="products",
     )
     cart_items: Mapped[list["CartItem"]] = relationship(

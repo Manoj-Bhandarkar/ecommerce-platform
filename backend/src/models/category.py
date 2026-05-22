@@ -19,6 +19,6 @@ class Category(TimestampMixin, Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     products: Mapped[list["Product"]] = relationship(
         "src.models.product.Product",
-        secondary=product_category_table,
+        secondary="product_category_table",
         back_populates="categories",
     )
