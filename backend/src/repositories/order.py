@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -32,3 +34,23 @@ class OrderRepository:
     ) -> None:
         session.add(order)
         await session.flush()
+
+    @staticmethod
+    async def get_user_orders(
+        session: AsyncSession,
+        user_id: UUID,
+    ) -> list[Order]:
+
+        stmt = (
+            select(Order)
+            .where(Order.user_id == user_id)
+            .options(
+                selectinload(Order.order_items).selectinload(OrderItem.product),
+                selectinload(Order.shipping_address),
+                selectinload(Order.shipping_status),
+                selectinload(Order.payment),
+            )
+            .order_by(Order.created_at.desc())
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()

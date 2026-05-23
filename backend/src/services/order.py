@@ -109,3 +109,13 @@ async def checkout(
         session=session,
         order_id=order.id,
     )
+
+
+async def get_placed_order_for_user(
+    session: AsyncSession,
+    user_id: UUID,
+) -> list[Order]:
+    return await OrderRepository.get_user_orders(
+        session=session,
+        user_id=user_id,
+    )
