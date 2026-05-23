@@ -51,7 +51,6 @@ class OrderRepository:
         user_id: UUID,
         order_id: int,
     ) -> Order | None:
-
         stmt = (
             select(Order)
             .where(Order.id == order_id, Order.user_id == user_id)
@@ -64,3 +63,11 @@ class OrderRepository:
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
+
+    @staticmethod
+    async def save(session: AsyncSession) -> None:
+        await session.commit()
+
+    @staticmethod
+    async def refresh_order(session: AsyncSession, order: Order) -> None:
+        await session.refresh(order)

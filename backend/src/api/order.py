@@ -3,7 +3,12 @@ from src.dependencies.current_user import get_current_user
 from src.models.user import User
 from src.core.database import SessionDep
 from src.schemas.order import OrderOut
-from src.services.order import checkout, get_order_by_id, get_placed_order_for_user
+from src.services.order import (
+    cancel_order,
+    checkout,
+    get_order_by_id,
+    get_placed_order_for_user,
+)
 from src.schemas.payment import PaymentCreate
 
 router = APIRouter()
@@ -32,3 +37,10 @@ async def get_user_order_by_id(
     user: User = Depends(get_current_user),
 ):
     return await get_order_by_id(session, user.id, order_id)
+
+
+@router.patch("/cancel/{order_id}", response_model=OrderOut)
+async def order_cancel(
+    session: SessionDep, order_id: int, user: User = Depends(get_current_user)
+):
+    return await cancel_order(session, user.id, order_id)

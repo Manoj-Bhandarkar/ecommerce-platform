@@ -2,6 +2,8 @@ from decimal import Decimal
 from uuid import UUID
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.api import order
+from src.models.payment import PaymentStatusEnum
 from src.models.order import Order, OrderStatusEnum
 from src.models.order_item import OrderItem
 from src.models.shipping_status import ShippingStatus, ShippingStatusEnum
@@ -123,4 +125,44 @@ async def get_order_by_id(session: AsyncSession, user_id: UUID, order_id: int) -
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Order not found",
         )
+    return order
+
+
+async def cancel_order(session: AsyncSession, user_id: UUID, order_id: int) -> Order:
+    order = await OrderRepository.get_user_order_by_id(
+        session=session,
+        user_id=user_id,
+        order_id=order_id,
+    )
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+    if order.status == OrderStatusEnum.cancelled:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order already cancelled",
+        )
+    if (
+        not order.shipping_status
+        or order.shipping_status.status != ShippingStatusEnum.pending
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only pending orders can be cancelled",
+        )
+    # restore stock
+    for item in order.orderitems:
+        if item.product:
+            item.product.stock_quantity += item.quantity
+    # update statuses
+    order.status = OrderStatusEnum.cancelled
+    order.shipping_status.status = ShippingStatusEnum.cancelled
+    # update payment
+    if order.payment and order.payment.is_paid:
+        order.payment.status = PaymentStatusEnum.cancelled
+        order.payment.is_paid = False
+    await OrderRepository.save(session)
+    await OrderRepository.refresh_order(session=session, order=order)
     return order
