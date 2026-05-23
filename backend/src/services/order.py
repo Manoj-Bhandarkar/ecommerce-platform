@@ -14,9 +14,7 @@ from src.services.payment import create_payment
 
 
 async def checkout(
-    session: AsyncSession,
-    user_id: UUID,
-    payment_data: PaymentCreate,
+    session: AsyncSession, user_id: UUID, payment_data: PaymentCreate
 ) -> Order:
     cart_items = await CartRepository.get_user_cart_items(
         session=session,
@@ -100,22 +98,29 @@ async def checkout(
         )
         if product:
             product.stock_quantity -= oi.quantity
-    await CartRepository.clear_cart_items(
-        session=session,
-        cart_items=cart_items,
-    )
+    await CartRepository.clear_cart_items(session=session, cart_items=cart_items)
     await session.commit()
-    return await OrderRepository.get_order_by_id(
-        session=session,
-        order_id=order.id,
-    )
+    return await OrderRepository.get_order_by_id(session=session, order_id=order.id)
 
 
 async def get_placed_order_for_user(
-    session: AsyncSession,
-    user_id: UUID,
+    session: AsyncSession, user_id: UUID
 ) -> list[Order]:
     return await OrderRepository.get_user_orders(
         session=session,
         user_id=user_id,
     )
+
+
+async def get_order_by_id(session: AsyncSession, user_id: UUID, order_id: int) -> Order:
+    order = await OrderRepository.get_user_order_by_id(
+        session=session,
+        user_id=user_id,
+        order_id=order_id,
+    )
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+    return order

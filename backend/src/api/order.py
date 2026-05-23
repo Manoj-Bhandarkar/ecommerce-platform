@@ -3,7 +3,7 @@ from src.dependencies.current_user import get_current_user
 from src.models.user import User
 from src.core.database import SessionDep
 from src.schemas.order import OrderOut
-from src.services.order import checkout, get_placed_order_for_user
+from src.services.order import checkout, get_order_by_id, get_placed_order_for_user
 from src.schemas.payment import PaymentCreate
 
 router = APIRouter()
@@ -23,3 +23,12 @@ async def get_user_order_list(
     session: SessionDep, user: User = Depends(get_current_user)
 ):
     return await get_placed_order_for_user(session, user.id)
+
+
+@router.get("/{order_id}", response_model=OrderOut)
+async def get_user_order_by_id(
+    session: SessionDep,
+    order_id: int,
+    user: User = Depends(get_current_user),
+):
+    return await get_order_by_id(session, user.id, order_id)

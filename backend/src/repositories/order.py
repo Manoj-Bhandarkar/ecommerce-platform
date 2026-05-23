@@ -10,10 +10,7 @@ from src.models.order_item import OrderItem
 class OrderRepository:
 
     @staticmethod
-    async def get_order_by_id(
-        session: AsyncSession,
-        order_id: int,
-    ) -> Order | None:
+    async def get_order_by_id(session: AsyncSession, order_id: int) -> Order | None:
         stmt = (
             select(Order)
             .where(Order.id == order_id)
@@ -28,19 +25,12 @@ class OrderRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def create_order(
-        session: AsyncSession,
-        order: Order,
-    ) -> None:
+    async def create_order(session: AsyncSession, order: Order) -> None:
         session.add(order)
         await session.flush()
 
     @staticmethod
-    async def get_user_orders(
-        session: AsyncSession,
-        user_id: UUID,
-    ) -> list[Order]:
-
+    async def get_user_orders(session: AsyncSession, user_id: UUID) -> list[Order]:
         stmt = (
             select(Order)
             .where(Order.user_id == user_id)
@@ -54,3 +44,23 @@ class OrderRepository:
         )
         result = await session.execute(stmt)
         return result.scalars().all()
+
+    @staticmethod
+    async def get_user_order_by_id(
+        session: AsyncSession,
+        user_id: UUID,
+        order_id: int,
+    ) -> Order | None:
+
+        stmt = (
+            select(Order)
+            .where(Order.id == order_id, Order.user_id == user_id)
+            .options(
+                selectinload(Order.shipping_address),
+                selectinload(Order.shipping_status),
+                selectinload(Order.order_items).selectinload(OrderItem.product),
+                selectinload(Order.payment),
+            )
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
