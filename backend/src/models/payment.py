@@ -1,7 +1,7 @@
 from decimal import Decimal
 from enum import Enum as PyEnum
 from uuid import UUID
-from sqlalchemy import Enum, ForeignKey, Numeric, String
+from sqlalchemy import Boolean, Enum, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.db.base import Base
 from src.models.common import TimestampMixin
@@ -51,14 +51,19 @@ class Payment(TimestampMixin, Base):
         default=PaymentGatewayEnum.mock,
         nullable=False,
     )
-# payment gateway specific fields
+    is_paid: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+    )
+    # payment gateway specific fields
     pg_order_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     pg_payment_id: Mapped[str | None] = mapped_column(
         String(100),
         nullable=True,
-        index=True,
     )
     pg_signature: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
-    order: Mapped["Order"] = relationship("Order", back_populates="payment")
+    order: Mapped["Order"] = relationship(
+        "Order", back_populates="payment", lazy="selectin"
+    )
     user: Mapped["User"] = relationship("User", back_populates="payments")

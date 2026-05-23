@@ -3,13 +3,13 @@ from sqlalchemy import String, Numeric, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.db.base import Base
 from src.models.common import TimestampMixin
+from src.models.product_category import product_category_table
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.models.category import Category
     from src.models.cart_item import CartItem
     from src.models.order_item import OrderItem
-    from src.models.product_category import product_category_table
 
 
 class Product(TimestampMixin, Base):
@@ -33,8 +33,8 @@ class Product(TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(default=True)
 
     categories: Mapped[list["Category"]] = relationship(
-        "src.models.category.Category",
-        secondary="product_category_table",
+        "Category",
+        secondary=product_category_table,
         back_populates="products",
     )
     cart_items: Mapped[list["CartItem"]] = relationship(

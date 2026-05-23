@@ -16,6 +16,7 @@ class CartRepository:
             select(CartItem)
             .where(CartItem.user_id == user_id)
             .options(selectinload(CartItem.product))
+            .with_for_update()
         )
         result = await session.execute(stmt)
         return result.scalars().all()
@@ -89,3 +90,11 @@ class CartRepository:
     @staticmethod
     async def commit(session: AsyncSession) -> None:
         await session.commit()
+
+    @staticmethod
+    async def clear_cart_items(
+        session: AsyncSession,
+        cart_items: list[CartItem],
+    ) -> None:
+        for item in cart_items:
+            await session.delete(item)

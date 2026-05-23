@@ -18,7 +18,7 @@ class Category(TimestampMixin, Base):
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     products: Mapped[list["Product"]] = relationship(
-        "src.models.product.Product",
-        secondary="product_category_table",
+        "Product",
+        secondary=product_category_table,
         back_populates="categories",
     )

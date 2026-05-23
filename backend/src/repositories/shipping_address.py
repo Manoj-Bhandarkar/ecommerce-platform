@@ -51,5 +51,10 @@ class ShippingAddressRepository:
         session: AsyncSession,
         address: ShippingAddress,
     ) -> None:
-
         await session.delete(address)
+
+    @staticmethod
+    async def get_address_by_id(
+        session: AsyncSession, address_id: int
+    ) -> ShippingAddress | None:
+        return await session.get(ShippingAddress, address_id)

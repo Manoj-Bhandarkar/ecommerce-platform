@@ -1,4 +1,4 @@
-import enum
+import enum as PyEnum
 from sqlalchemy import Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models.common import TimestampMixin
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from src.models.order import Order
 
 
-class ShippingStatusEnum(str, enum.Enum):
+class ShippingStatusEnum(str, PyEnum.Enum):
     pending = "pending"
     packed = "packed"
     shipped = "shipped"

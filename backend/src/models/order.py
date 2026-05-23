@@ -26,7 +26,7 @@ class Order(TimestampMixin, Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     total_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     status: Mapped[OrderStatusEnum] = mapped_column(
@@ -37,7 +37,10 @@ class Order(TimestampMixin, Base):
     )
 
     order_items: Mapped[list["OrderItem"]] = relationship(
-        back_populates="order", cascade="all, delete-orphan"
+        "OrderItem",
+        back_populates="order",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
     shipping_address: Mapped["ShippingAddress"] = relationship(
         "ShippingAddress", back_populates="orders", lazy="selectin"
@@ -55,4 +58,5 @@ class Order(TimestampMixin, Base):
         back_populates="order",
         uselist=False,
         cascade="all, delete-orphan",
+        lazy="selectin",
     )

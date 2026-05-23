@@ -115,8 +115,14 @@ class ProductRepository:
         await session.refresh(product)
         return product
 
-
     @staticmethod
     async def delete(session: AsyncSession, product: Product) -> None:
         await session.delete(product)
         await session.commit()
+
+    @staticmethod
+    async def get_product_by_id(
+        session: AsyncSession,
+        product_id: int,
+    ) -> Product | None:
+        return await session.get(Product, product_id)
