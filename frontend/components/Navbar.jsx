@@ -1,18 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
-  const { user, loading, logout } = useAuth();
-  const pathname = usePathname();
-
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/product", label: "Products" },
-    { href: "/cart", label: "Cart" },
-  ];
 
   return (
     <nav className="bg-white shadow sticky top-0 z-50">
@@ -22,44 +12,14 @@ const Navbar = () => {
         </Link>
 
         <div className="space-x-4 flex items-center">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={
-                pathname === link.href
-                  ? "font-semibold underline"
-                  : "hover:underline"
-              }
-            >
-              {link.label}
-            </Link>
-          ))}
 
-          {loading ? (
-            <span className="text-gray-400 animate-pulse">Loading...</span>
-          ) : user ? (
-            <>
-              <Link href="/user/order" className="hover:underline">
-                My Orders
-              </Link>
-              <button
-                onClick={logout}
-                className="hover:underline text-red-600"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/login" className="hover:underline">
-                Login
-              </Link>
-              <Link href="/register" className="hover:underline">
-                Register
-              </Link>
-            </>
-          )}
+          <Link href="/" className="hover:underline">Home</Link>
+          <Link href="/product" className="hover:underline">Products</Link>
+          <Link href="/cart" className="hover:underline">Cart</Link>
+          <Link href="/user/order" className="hover:underline">My Orders</Link>
+          <Link href="/login" className="hover:underline">Login</Link>
+          <Link href="/register" className="hover:underline">Register</Link>
+          <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Logout</button>
         </div>
       </div>
     </nav>
