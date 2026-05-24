@@ -39,12 +39,26 @@ src/migrations/versions/__pycache__/
 # =========================
 media/
 uploads/
+# =========================
+# Python cache
+# =========================
+*.egg-info/
+.eggs/
 
+# =========================
+# Environment files
+# =========================
+backend/.env
+frontend/.env.local
+# =========================
+# Mac/Linux/Windows
+# =========================
+*.swp
 # =========================
 # Node.js / NextJS
 # =========================
-node_modules/
-.next/
+frontend/.next/
+frontend/node_modules/
 out/
 dist/
 
