@@ -74,9 +74,10 @@ class ProductRepository:
     ):
         stmt = select(Product).options(selectinload(Product.categories))
         if category_names:
+            lower_categories = [c.lower() for c in category_names]
             stmt = (
                 stmt.join(Product.categories)
-                .where(Category.name.in_(category_names))
+                .where(func.lower(Category.slug).in_(lower_categories))
                 .distinct()
             )
         filters = []

@@ -11,8 +11,11 @@ from src.api.shipping_address import router as shipping_address_router
 from src.api.order import router as order_router
 from src.api.shipping_status import router as shipping_status_router
 from src.api.payment import router as payment_router
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title=settings.PROJECT_NAME)
+
+app.mount("/media", StaticFiles(directory="media"), name="media")
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,10 +36,24 @@ app.include_router(
 )
 app.include_router(auth_router, prefix=f"{settings.API_PREFIX}/auth", tags=["Auth"])
 app.include_router(admin_router, prefix=f"{settings.API_PREFIX}/admin", tags=["Admin"])
-app.include_router(category_router, prefix=f"{settings.API_PREFIX}/categories", tags=["Categories"])
-app.include_router(product_router, prefix=f"{settings.API_PREFIX}/product", tags=["Products"])
-app.include_router(cart_item_router, prefix=f"{settings.API_PREFIX}/cart", tags=["Cart"])
-app.include_router(shipping_address_router, prefix=f"{settings.API_PREFIX}/shipping", tags=["Shipping"])
-app.include_router(shipping_status_router, prefix=f"{settings.API_PREFIX}/shipping/status", tags=["Shipping Status"])
+app.include_router(
+    category_router, prefix=f"{settings.API_PREFIX}/categories", tags=["Categories"]
+)
+app.include_router(
+    product_router, prefix=f"{settings.API_PREFIX}/product", tags=["Products"]
+)
+app.include_router(
+    cart_item_router, prefix=f"{settings.API_PREFIX}/cart", tags=["Cart"]
+)
+app.include_router(
+    shipping_address_router, prefix=f"{settings.API_PREFIX}/shipping", tags=["Shipping"]
+)
+app.include_router(
+    shipping_status_router,
+    prefix=f"{settings.API_PREFIX}/shipping/status",
+    tags=["Shipping Status"],
+)
 app.include_router(order_router, prefix=f"{settings.API_PREFIX}/order", tags=["Order"])
-app.include_router(payment_router, prefix=f"{settings.API_PREFIX}/payment", tags=["Payment"])
+app.include_router(
+    payment_router, prefix=f"{settings.API_PREFIX}/payment", tags=["Payment"]
+)
