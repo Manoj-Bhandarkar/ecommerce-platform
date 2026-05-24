@@ -51,12 +51,9 @@ async def create_payment(
 async def get_payment_by_order_id(
     session: AsyncSession, order_id: int, user_id: UUID
 ) -> Payment:
-    payment = await PaymentRepository.get_by_order_id_and_user_id(
+    return await PaymentRepository.get_payment_by_order_id(
         session=session, order_id=order_id, user_id=user_id
     )
-    if not payment:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Payment not found",
-        )
-    return payment
+
+async def list_payments_by_user(session: AsyncSession, user_id: UUID) -> list[Payment]:
+    return await PaymentRepository.get_user_payments(session=session, user_id=user_id)

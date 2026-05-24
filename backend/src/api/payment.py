@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from src.dependencies.current_user import get_current_user
 from src.models.user import User
 from src.core.database import SessionDep
-from src.services.payment import get_payment_by_order_id
+from src.services.payment import get_payment_by_order_id, list_payments_by_user
 from src.schemas.payment import PaymentOut
 
 router = APIRouter()
@@ -14,4 +14,17 @@ async def get_payment_status_by_order(
     order_id: int,
     user: User = Depends(get_current_user),
 ):
-    return await get_payment_by_order_id(session, order_id, user.id)
+    payment = await get_payment_by_order_id(session, order_id, user.id)
+    if not payment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Payment not found",
+        )
+    return payment
+
+
+@router.get("", response_model=list[PaymentOut])
+async def get_all_payments_by_user(
+    session: SessionDep, user: User = Depends(get_current_user)
+):
+    return await list_payments_by_user(session, user.id)

@@ -12,7 +12,7 @@ class PaymentRepository:
         await session.flush()
 
     @staticmethod
-    async def get_by_order_id_and_user_id(
+    async def get_payment_by_order_id(
         session: AsyncSession, order_id: int, user_id: UUID
     ) -> Payment | None:
         stmt = select(Payment).where(
@@ -21,3 +21,13 @@ class PaymentRepository:
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
+
+    @staticmethod
+    async def get_user_payments(session: AsyncSession, user_id: UUID) -> list[Payment]:
+        stmt = (
+            select(Payment)
+            .where(Payment.user_id == user_id)
+            .order_by(Payment.created_at.desc())
+        )
+        result = await session.execute(stmt)
+        return result.scalars().all()
