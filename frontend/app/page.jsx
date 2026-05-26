@@ -2,6 +2,7 @@
 import Hero from "@/components/Hero";
 import ProductCard from "@/components/ProductCard";
 import axios from "axios";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -34,7 +35,11 @@ export default function Home() {
   return (
     <div className="space-y-10">
       <Hero />
-      <section className="text-2xl font-bold container mx-auto px-4"> Clothings Products </section>
+      <section className="text-2xl font-bold container mx-auto px-4"><div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Clothing Products</h2>
+        <Link href="/product" className="text-blue-600">View All</Link>
+      </div>
+      </section>
       {
         clothings.length === 0 ? (
           <div className="text-center mt-10">No clothing products found.</div>
@@ -47,7 +52,20 @@ export default function Home() {
           </div>
         )
       }
-      <section className="text-2xl font-bold container mx-auto px-4"> Electronics Products </section>
+      <section className="text-2xl font-bold container mx-auto px-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">
+            Electronics Products
+          </h2>
+
+          <Link
+            href="/product"
+            className="text-blue-600"
+          >
+            View All
+          </Link>
+        </div>
+      </section>
       {
         electronics.length === 0 ? (
           <div className="text-center mt-10">No electronics products found.</div>
