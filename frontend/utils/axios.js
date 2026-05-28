@@ -9,18 +9,23 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        const requestUrl = originalRequest.url || "";
         if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-            !originalRequest.url.includes("/refresh")
-    ) {
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            !requestUrl.includes("/refresh") &&
+            !requestUrl.includes("/login") && 
+            !requestUrl.includes("/account/me")
+        ) {
             originalRequest._retry = true;
             try {
-                await api.post("/api/account/refresh");
+                await api.post("/api/v1/account/refresh");
                 return api(originalRequest);
             } catch (refreshError) {
                 console.error("Refresh token expired");
-                window.location.href = "/login";
+                if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+                    window.location.href = "/login";
+                }
                 return Promise.reject(refreshError);
             }
         }
