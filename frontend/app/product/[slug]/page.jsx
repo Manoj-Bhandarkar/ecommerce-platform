@@ -27,26 +27,26 @@ const ProductDetailPage = () => {
     if (slug) fetchProduct()
   }, [slug])
 
-  const handleAddToCart = async () =>{
-    if (!user){
+  const handleAddToCart = async () => {
+    if (!user) {
       router.push(`/login?redirect=/product/${product.slug}`);
       return
     }
 
-     try {
-      await api.post("/api/carts/add", {
+    try {
+      await api.post("/api/v1/cart/add", {
         product_id: product.id,
         quantity: 1,
       });
       router.push("/cart");
-      
+
     } catch (error) {
-      console.error("Error adding to cart:", err);      
+      console.error("Error adding to cart:", error);
     }
 
   }
 
- 
+
   if (loading) return <p className="text-center text-gray-600">Loading product...</p>
   if (!product) return <p className="text-center text-red-500">Product not found.</p>
 
@@ -55,7 +55,7 @@ const ProductDetailPage = () => {
       <div className="grid md:grid-cols-2 gap-6">
         {/* Product Image */}
         <img
-          src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${product.image_url.replace(/\\/g, '/')}`}
+          src={product.image_url ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${product.image_url.replace(/\\/g, '/')}` : '/placeholder-image.jpg'}
           alt={product.title}
           className="w-full h-64 object-cover rounded"
         />
