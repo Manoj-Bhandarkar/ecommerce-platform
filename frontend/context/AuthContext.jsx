@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await api.post("/api/v1/account/logout");
+      await api.post("/api/v1/auth/logout");
     } catch (err) {
       console.error("Logout API failed:", err);
     } finally {
