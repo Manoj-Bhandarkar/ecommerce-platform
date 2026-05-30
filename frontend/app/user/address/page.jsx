@@ -37,7 +37,9 @@ export default function AddressPage() {
         }
     }
 
-    if (loading) return <div className="p-6">Loading addresses...</div>
+    if (loading) return <div className="p-6"><div className="flex justify-center py-10">
+        <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+    </div></div>
     if (error) return <div className="p-6 text-red-600">{error}</div>
 
     return (
@@ -51,18 +53,26 @@ export default function AddressPage() {
                 ➕ Add Address
             </button>
             {addresses.length === 0 ? (
-                <p>No addresses found. Add one to continue.</p>
+                <div className="text-center py-10">
+                    <p className="text-gray-500 mb-4">No addresses found.</p>
+                    <button
+                        onClick={() => router.push('/user/address/create')}
+                        className="bg-indigo-600 text-white px-4 py-2 rounded"
+                    >
+                        Add Your First Address
+                    </button>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {addresses.map((addr) => (
                         <div key={addr.id} className="border p-4 rounded shadow max-w-md">
-                            <div className="flex mb-1"><strong className="w-28 shrink-0">Name :</strong> <span>{addr.name}</span></div>
-                            <div className="flex mb-1"><strong className="w-28 shrink-0">Mobile :</strong> <span>{addr.phone_number}</span></div>
-                            <div className="flex mb-1"><strong className="w-28 shrink-0">Address :</strong> <span>{addr.address_line1 + (addr.address_line2 ? `, ${addr.address_line2}` : '')}</span></div>
-                            <div className="flex mb-1"><strong className="w-28 shrink-0">City :</strong> <span>{addr.city}</span></div>
-                            <div className="flex mb-1"><strong className="w-28 shrink-0">State :</strong> <span>{addr.state}</span></div>
-                            <div className="flex mb-1"><strong className="w-28 shrink-0">Pin Code :</strong> <span>{addr.pin_code}</span></div>
-                            <div className="flex mb-3"><strong className="w-28 shrink-0">Country :</strong> <span>{addr.country}</span></div>
+                            <div className="flex mb-1"><strong className="w-28 shrink-0">Name</strong> <span>: {addr.name}</span></div>
+                            <div className="flex mb-1"><strong className="w-28 shrink-0">Phone</strong> <span>: {addr.phone_number}</span></div>
+                            <div className="flex mb-1"><strong className="w-28 shrink-0">Address</strong> <span>: {addr.address_line1 + (addr.address_line2 ? `, ${addr.address_line2}` : '')}</span></div>
+                            <div className="flex mb-1"><strong className="w-28 shrink-0">City</strong> <span>: {addr.city}</span></div>
+                            <div className="flex mb-1"><strong className="w-28 shrink-0">State</strong> <span>: {addr.state}</span></div>
+                            <div className="flex mb-1"><strong className="w-28 shrink-0">Pin Code</strong> <span>: {addr.pin_code}</span></div>
+                            <div className="flex mb-3"><strong className="w-28 shrink-0">Country</strong> <span>: {addr.country}</span></div>
                             <div className="mt-4 flex gap-2">
                                 <button className="bg-blue-500 text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 shadow-sm hover:bg-blue-600 transition">
                                     ✏️ Edit

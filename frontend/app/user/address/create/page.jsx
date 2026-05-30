@@ -16,7 +16,6 @@ const CreateAddress = () => {
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
-
     const router = useRouter()
 
     const handleChange = (e) => {
@@ -24,81 +23,35 @@ const CreateAddress = () => {
         setError(null)
     }
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault()
-    //     setLoading(true)
-    //     setError(null)
-    //     if (!/^\d{10}$/.test(form.phone_number)) {
-    //         setError("Phone number must be exactly 10 digits")
-    //         return
-    //     }
-
-    //     if (!/^\d{6}$/.test(form.pin_code)) {
-    //         setError("PIN code must be exactly 6 digits")
-    //         return
-    //     }
-
-    //     setLoading(true)
-
-    //     try {
-    //         await api.post('/api/v1/shipping/address', form)
-    //         router.push('/user/address')
-    //     } catch (err) {
-    //         setError(err.response?.data?.detail || 'Failed to save address')
-    //     } finally {
-    //         setLoading(false)
-    //     }
-    // }
     const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    console.log("Submit clicked")
-
-    setError(null)
-
-    if (!/^\d{10}$/.test(form.phone_number)) {
-        console.log("Phone validation failed")
-        setError("Phone number must be exactly 10 digits")
-        return
+        e.preventDefault()
+        console.log("Submit clicked")
+        setError(null)
+        if (!/^\d{10}$/.test(form.phone_number)) {
+            setError("Phone number must be exactly 10 digits")
+            return
+        }
+        if (!/^\d{6}$/.test(form.pin_code)) {
+            setError("PIN code must be exactly 6 digits")
+            return
+        }
+        setLoading(true)
+        try {
+            const res = await api.post(
+                "/api/v1/shipping/address",
+                form
+            )
+            router.push("/user/address")
+        } catch (err) {
+            setError(
+                err.response?.data?.detail ||
+                err.message ||
+                "Failed to save address"
+            )
+        } finally {
+            setLoading(false)
+        }
     }
-
-    if (!/^\d{6}$/.test(form.pin_code)) {
-        console.log("PIN validation failed")
-        setError("PIN code must be exactly 6 digits")
-        return
-    }
-
-    setLoading(true)
-
-    try {
-        console.log("Sending request...")
-
-        const res = await api.post(
-            "/api/v1/shipping/address",
-            form
-        )
-
-        console.log("Success:", res.data)
-
-        router.push("/user/address")
-
-    } catch (err) {
-
-        console.log("Error:", err)
-
-        setError(
-            err.response?.data?.detail ||
-            err.message ||
-            "Failed to save address"
-        )
-
-    } finally {
-
-        console.log("Finished")
-
-        setLoading(false)
-    }
-}
 
     return (
         <div className="p-6 max-w-xl mx-auto">
