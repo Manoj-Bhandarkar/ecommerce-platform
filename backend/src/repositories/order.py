@@ -69,5 +69,17 @@ class OrderRepository:
         await session.commit()
 
     @staticmethod
-    async def refresh_order(session: AsyncSession, order: Order) -> None:
-        await session.refresh(order)
+    async def refresh_order(session: AsyncSession, order_id: int, user_id):
+        stmt = (
+            select(Order)
+            .where(Order.id == order_id, Order.user_id == user_id)
+            .options(
+                selectinload(Order.shipping_address),
+                selectinload(Order.shipping_status),
+                selectinload(Order.payment),
+                selectinload(Order.order_items).selectinload(OrderItem.product),
+            )
+        )
+        result = await session.execute(stmt)
+
+        return result.scalar_one()

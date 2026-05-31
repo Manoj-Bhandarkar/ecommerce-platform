@@ -2,7 +2,6 @@ from decimal import Decimal
 from uuid import UUID
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.api import order
 from src.models.payment import PaymentStatusEnum
 from src.models.order import Order, OrderStatusEnum
 from src.models.order_item import OrderItem
@@ -153,7 +152,7 @@ async def cancel_order(session: AsyncSession, user_id: UUID, order_id: int) -> O
             detail="Only pending orders can be cancelled",
         )
     # restore stock
-    for item in order.orderitems:
+    for item in order.order_items:
         if item.product:
             item.product.stock_quantity += item.quantity
     # update statuses
@@ -164,5 +163,9 @@ async def cancel_order(session: AsyncSession, user_id: UUID, order_id: int) -> O
         order.payment.status = PaymentStatusEnum.cancelled
         order.payment.is_paid = False
     await OrderRepository.save(session)
-    await OrderRepository.refresh_order(session=session, order=order)
-    return order
+
+    return await OrderRepository.refresh_order(
+        session=session,
+        order_id=order.id,
+        user_id=user_id,
+    )
