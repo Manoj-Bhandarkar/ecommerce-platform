@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
         if (loggedInUser.is_admin) {
           router.push("/user/dashboard");
         } else {
-          
+          router.push("/user/order");
         }
       }
     } catch (err) {

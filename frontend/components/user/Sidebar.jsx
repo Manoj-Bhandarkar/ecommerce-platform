@@ -22,7 +22,9 @@ export default function Sidebar() {
     }
 
     const navItems = [
-
+        ...(user?.is_admin ? [
+           {name: "Dashboard", href: "/user/dashboard"}
+        ] : []),
         { name: "My Orders", href: "/user/order" },
         { name: "Shipping Address", href: "/user/address" },
         {name: "Payments History", href: "/user/payments"},

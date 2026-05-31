@@ -3,6 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 const LoginPage = () => {
@@ -11,14 +12,16 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect')
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && user) {
       if (user.is_admin) {
-        router.replace("/user/dashboard");
+        router.push(redirect || '/user/dashboard')
       } else {
-        router.replace("/user/order");
+        router.push(redirect || '/user/order')
       }
     }
   }, [user, loading, router]);
@@ -72,8 +75,8 @@ const LoginPage = () => {
             required
           />
         </div>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isSubmitting}
           className={`w-full text-white p-2 rounded font-medium transition-colors ${isSubmitting ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
