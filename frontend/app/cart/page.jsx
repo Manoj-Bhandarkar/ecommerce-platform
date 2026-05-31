@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import api from '@/utils/axios'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/context/AuthContext' 
+import { useAuth } from '@/context/AuthContext'
 
 const CartPage = () => {
   const [cart, setCart] = useState(null)
@@ -55,62 +55,135 @@ const CartPage = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6">🛒 Your Cart</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="lg:col-span-8 space-y-4">
+          {cart.items.map(item => (
+            <div
+              key={item.id}
+              className="bg-white border border-gray-200 p-4 flex gap-4"
+            >
+              {/* Product Image */}
+              <div className="w-28 flex-shrink-0">
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${item.product_image}`}
+                  alt={item.product_title}
+                  className="w-28 h-28 object-contain"
+                />
 
-      <div className="space-y-4">
-        {cart.items.map(item => (
-          <div key={item.id} className="border rounded-lg p-4 shadow-sm">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="font-semibold">{item.product_title}</h2>
-                <p className="text-sm text-gray-600">
-                  ₹{item.price} x {item.quantity} = ₹{item.total}
-                </p>
+                {/* Quantity Controls */}
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  <button
+                    onClick={() =>
+                      updateCart(
+                        "patch",
+                        `/api/v1/cart/decrease/${item.product_id}`,
+                        item.id
+                      )
+                    }
+                    className="w-8 h-8 border rounded-full"
+                  >
+                    -
+                  </button>
+
+                  <span className="w-10 text-center">
+                    {item.quantity}
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      updateCart(
+                        "patch",
+                        `/api/v1/cart/increase/${item.product_id}`,
+                        item.id
+                      )
+                    }
+                    className="w-8 h-8 border rounded-full"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => updateCart('patch', `/api/v1/cart/decrease/${item.product_id}`)}
-                  className="px-3 py-1 bg-gray-200 text-lg rounded hover:bg-gray-300"
-                  disabled={updatingItemId === item.id}
-                >
-                  −
-                </button>
+              {/* Product Details */}
+              <div className="flex-1">
+                <h2 className="font-medium text-gray-900">
+                  {item.product_title}
+                </h2>
 
-                <span className="font-semibold">{item.quantity}</span>
+                <div className="mt-3">
+                  <span className="text-xl font-semibold">
+                    ₹{item.price}
+                  </span>
+                </div>
 
-                <button
-                  onClick={() => updateCart('patch', `/api/v1/cart/increase/${item.product_id}`)}
-                  className="px-3 py-1 bg-gray-200 text-lg rounded hover:bg-gray-300"
-                  disabled={updatingItemId === item.id}
-                >
-                  +
-                </button>
+                <div className="flex gap-6 mt-4">
+                  <button
+                    className="font-medium hover:text-blue-600"
+                  >
+                    SAVE FOR LATER
+                  </button>
 
-                <button
-                  onClick={() => updateCart('delete', `/api/v1/cart/delete/${item.id}`)}
-                  className="text-red-500 hover:underline ml-4"
-                  disabled={updatingItemId === item.id}
-                >
-                  Remove
-                </button>
+                  <button
+                    onClick={() =>
+                      updateCart(
+                        "delete",
+                        `/api/v1/cart/delete/${item.id}`,
+                        item.id
+                      )
+                    }
+                    className="font-medium hover:text-red-600"
+                  >
+                    REMOVE
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="mt-8 border-t pt-4 text-right">
-        <p className="text-lg font-semibold">
-          Total ({cart.total_quantity} items): ₹{cart.total_price}
-        </p>
-        <button
-          onClick={() => router.push('/checkout')}
-          className="inline-block mt-4 bg-indigo-600 text-white px-6 py-3 rounded hover:bg-indigo-700 transition"
-        >
-          Proceed to Payment
-        </button>
+        <div className="lg:col-span-4">
+          <div className="sticky top-4">
+            <div className="p-4 border-b text-gray-500 uppercase text-sm font-medium">
+              Price Details
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div className="flex justify-between">
+                <span>
+                  Price ({cart.total_quantity} items)
+                </span>
+                <span>
+                  ₹{cart.total_price}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Delivery Charges</span>
+                <span className="text-green-600">
+                  FREE
+                </span>
+              </div>
+
+              <div className="border-t pt-4 flex justify-between font-bold">
+                <span>Total Amount</span>
+                <span>
+                  ₹{cart.total_price}
+                </span>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-50">
+              <button
+                onClick={() => router.push("/checkout")}
+                className="w-full bg-[#fb641b] hover:bg-[#f95302] text-white py-3 font-medium"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
