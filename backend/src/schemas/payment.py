@@ -18,4 +18,6 @@ class PaymentOut(BaseModel):
     status: str
     is_paid: bool
     payment_gateway: PaymentGatewayEnum
+    pg_order_id: str | None
+    pg_payment_id: str | None
     model_config = {"from_attributes": True}

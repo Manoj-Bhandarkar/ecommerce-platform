@@ -25,6 +25,7 @@ export default function Sidebar() {
 
         { name: "My Orders", href: "/user/order" },
         { name: "Shipping Address", href: "/user/address" },
+        {name: "Payments History", href: "/user/payments"},
     ];
 
     return (
