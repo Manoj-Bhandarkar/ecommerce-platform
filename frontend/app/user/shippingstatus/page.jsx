@@ -131,7 +131,7 @@ const AdminShippingUpdateStatusPage = () => {
                                     </select>
                                 </div>
                             </div>
-                            <strong>Name: {order.shipping_address.name}</strong> <br />
+                            <strong>{order.shipping_address.name}</strong> <br />
                             <p className="text-sm text-gray-600">
                                 email: {order.email}
                             </p>

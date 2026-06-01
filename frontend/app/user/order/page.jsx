@@ -52,7 +52,7 @@ export default function OrdersPage() {
     } finally {
       setCancellingId(null)
     }
-  } 
+  }
 
   useEffect(() => {
     fetchOrders()
@@ -100,11 +100,18 @@ export default function OrdersPage() {
               {order.status}
             </span>
           </div>
-
-
-          <p className="text-sm text-gray-600 mb-2">
-            Placed on: {new Date(order.created_at).toLocaleString()}
+          <div className="flex justify-between items-center mb-2">
+            <p className="font-bold text-gray-600 mb-2">
+              {order.shipping_address.name}
+            </p>
+            <span className="text-sm text-gray-600 mb-2">
+              Placed on: {new Date(order.created_at).toLocaleString()}
+            </span>
+          </div>
+          <p className="text-sm text-gray-600">
+            Email: {order.email}
           </p>
+
 
           {/* Shipping Address */}
           <div className="mt-3 mb-3">
@@ -117,18 +124,22 @@ export default function OrdersPage() {
                 : ''}
               ,<br />
               {order.shipping_address.city}, {order.shipping_address.state} -{' '}
-              {order.shipping_address.pin_code},<br />
-              {order.shipping_address.country}
+              {order.shipping_address.pin_code}, {' '} {order.shipping_address.country}
             </p>
           </div>
 
           {/* Shipping Status */}
           <div className="mb-3">
             <h3 className="font-medium">🚚 Shipping Status</h3>
-            <p className="text-sm text-blue-700">
-              {order.shipping_status.status} (Updated:{' '}
-              {new Date(order.shipping_status.updated_at).toLocaleString()})
-            </p>
+
+            <div className="flex justify-between items-center mb-2">
+              <p className="font-sm text-gray-600 mb-2">
+                {order.shipping_status.status}
+              </p>
+              <span className="text-sm text-gray-600 mb-2">
+                Updated: {new Date(order.shipping_status.updated_at).toLocaleString()}
+              </span>
+            </div>  
           </div>
 
           {/* Items */}
