@@ -37,27 +37,26 @@ const ProductCreatePage = () => {
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target
-    if (type === 'file') {
-      setFormData((prev) => ({ ...prev, image: files[0] }))
-    } else if (name === 'category_ids') {
-      const selected = Array.from(e.target.selectedOptions, (opt) =>
-        parseInt(opt.value)
-      )
-      setFormData((prev) => ({ ...prev, category_ids: selected }))
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }))
-    }
 
     if (type === 'file') {
-      const file = files[0]
-      setFormData(prev => ({
+      const file = files?.[0]
+
+      setFormData((prev) => ({
         ...prev,
-        image: file
+        image: file,
       }))
+
       if (file) {
         setPreview(URL.createObjectURL(file))
       }
+
+      return
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
   const handleSubmit = async (e) => {
@@ -184,21 +183,30 @@ const ProductCreatePage = () => {
               ))}
             </div>
           </div>
-          {preview && (
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-40 h-40 object-cover rounded border"
-            />
-          )}
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          />
 
+          <div>
+            <label className="block mb-2 font-medium text-gray-700">
+              Product Image
+            </label>
+
+            <div className="flex items-center gap-4">
+              {preview && (
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-28 h-28 object-cover rounded-md border shadow-sm"
+                />
+              )}
+
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleChange}
+                className="text-sm border rounded p-2 flex-1"
+              />
+            </div>
+          </div>
           <button
             type="submit"
             disabled={loading}
