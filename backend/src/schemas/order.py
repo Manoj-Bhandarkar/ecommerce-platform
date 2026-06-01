@@ -23,6 +23,7 @@ class OrderItemOut(BaseModel):
 class OrderOut(BaseModel):
   id: int
   user_id: UUID
+  email: str | None
   total_price: float
   status: str
   created_at: datetime

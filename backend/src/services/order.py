@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.payment import PaymentStatusEnum
 from src.models.order import Order, OrderStatusEnum
+from src.models.user import User
 from src.models.order_item import OrderItem
 from src.models.shipping_status import ShippingStatus, ShippingStatusEnum
 from src.repositories.cart_item import CartRepository
@@ -18,11 +19,17 @@ from src.services.payment import create_payment
 
 
 async def checkout(
-    session: AsyncSession, user_id: UUID, payment_data: PaymentCreate
+    session: AsyncSession, user: User, payment_data: PaymentCreate
 ) -> Order:
+    user = await session.scalar(select(User).where(User.id == user.id))
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
     cart_items = await CartRepository.get_user_cart_items(
         session=session,
-        user_id=user_id,
+        user_id=user.id,
     )
     if not cart_items:
         raise HTTPException(
@@ -62,13 +69,14 @@ async def checkout(
         session=session,
         address_id=payment_data.shipping_address_id,
     )
-    if not address or address.user_id != user_id:
+    if not address or address.user_id != user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid shipping address",
         )
     order = Order(
-        user_id=user_id,
+        user_id=user.id,
+        email=user.email,
         total_price=total_price,
         shipping_address_id=payment_data.shipping_address_id,
         status=OrderStatusEnum.pending,
@@ -77,7 +85,7 @@ async def checkout(
     payment = await create_payment(
         session=session,
         data=payment_data,
-        user_id=user_id,
+        user_id=user.id,
         order_id=order.id,
     )
     if not payment.is_paid:

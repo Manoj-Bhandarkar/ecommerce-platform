@@ -28,6 +28,7 @@ class Order(TimestampMixin, Base):
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
+    email: Mapped[str | None] = mapped_column(nullable=True)
     total_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     status: Mapped[OrderStatusEnum] = mapped_column(
         Enum(OrderStatusEnum), default=OrderStatusEnum.pending, nullable=False

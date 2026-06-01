@@ -9,7 +9,7 @@ from src.services.order import (
     checkout,
     get_order_by_id,
     get_placed_order_for_user,
-    all_placed_order
+    all_placed_order,
 )
 from src.schemas.payment import PaymentCreate
 
@@ -22,7 +22,7 @@ async def checkout_order(
     payment_data: PaymentCreate,
     user: User = Depends(get_current_user),
 ):
-    return await checkout(session, user.id, payment_data)
+    return await checkout(session, user, payment_data)
 
 
 @router.get("", response_model=list[OrderOut])
