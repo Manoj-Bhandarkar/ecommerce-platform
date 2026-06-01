@@ -14,9 +14,12 @@ const ProductCard = ({ product }) => {
       <Link href={`/product/${product.slug}`}>
 
         <img
-          className="w-full h-48 object-cover rounded-lg"
+          className="w-full h-56   object-contain bg-gray-100 rounded-lg p-2"
           src={imageUrl}
           alt={product.title}
+          onError={(e) => {
+            e.target.src = "/placeholder.png"
+          }}
         />
 
         <h2 className="text-lg font-semibold mt-3 line-clamp-2 min-h-[3.5rem]">
