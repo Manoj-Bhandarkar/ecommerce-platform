@@ -144,7 +144,7 @@ export default function Dashboard() {
                                                 <td className="px-4 py-3">
                                                     <span
                                                         className={`inline-block px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-wider font-semibold
-                                        ${order.status === 'Confirmed' || order.status === 'Shipped'
+                                        ${order.status === 'confirmed' || order.status === 'shipped'
                                                                 ? 'bg-green-50 text-green-700 border border-green-100'
                                                                 : 'bg-yellow-50 text-yellow-700 border border-yellow-100'
                                                             }`}

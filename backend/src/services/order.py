@@ -1,6 +1,9 @@
 from decimal import Decimal
 from uuid import UUID
 from fastapi import HTTPException, status
+from sqlalchemy import select
+
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.payment import PaymentStatusEnum
 from src.models.order import Order, OrderStatusEnum
@@ -169,3 +172,31 @@ async def cancel_order(session: AsyncSession, user_id: UUID, order_id: int) -> O
         order_id=order.id,
         user_id=user_id,
     )
+
+
+async def all_placed_order(
+    session: AsyncSession,
+    shipping_status: str | None = None,
+    user_id: int | None = None,
+):
+    stmt = (
+        select(Order)
+        .where(Order.status == OrderStatusEnum.confirmed)
+        .options(
+            selectinload(Order.order_items).selectinload(OrderItem.product),
+            selectinload(Order.shipping_status),
+        )
+    )
+
+    # Filter by user if provided
+    if user_id:
+        stmt = stmt.where(Order.user_id == user_id)
+
+    # Filter by shipping status if provided
+    if shipping_status:
+        stmt = stmt.join(Order.shipping_status).where(
+            ShippingStatus.status == shipping_status
+        )
+
+    result = await session.execute(stmt)
+    return result.scalars().all()

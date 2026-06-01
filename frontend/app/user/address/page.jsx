@@ -61,12 +61,6 @@ export default function AddressPage() {
             {addresses.length === 0 ? (
                 <div className="text-center py-10">
                     <p className="text-gray-500 mb-4">No addresses found.</p>
-                    <button
-                        onClick={() => router.push('/user/address/create')}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded"
-                    >
-                        Add Your First Address
-                    </button>
                 </div>
             ) : (
                 <div className="space-y-4">
