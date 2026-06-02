@@ -1,7 +1,7 @@
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.category import Category
-
+from sqlalchemy.orm import selectinload
 
 class CategoryRepository:
 
@@ -25,7 +25,7 @@ class CategoryRepository:
 
     @staticmethod
     async def get_all(session: AsyncSession):
-        stmt = select(Category).order_by(Category.id)
+        stmt = select(Category).order_by(Category.id).options(selectinload(Category.products))
         result = await session.scalars(stmt)
         return result.all()
 

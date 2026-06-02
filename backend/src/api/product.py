@@ -60,7 +60,7 @@ async def product_create(
 async def list_products(
     session: SessionDep,
     categories: list[str] | None = Query(default=None),
-    limit: int = Query(default=5, ge=1, le=100),
+    limit: int = Query(default=10, ge=1, le=100),
     page: int = Query(default=1, ge=1),
 ):
     return await get_all_products(session, categories, limit, page)
@@ -74,7 +74,7 @@ async def products_search(
     description: str | None = Query(None),
     min_price: float | None = Query(None),
     max_price: float | None = Query(None),
-    limit: int = Query(default=5, ge=1, le=100),
+    limit: int = Query(default=10, ge=1, le=100),
     page: int = Query(default=1, ge=1),
 ):
     return await search_products(

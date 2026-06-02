@@ -159,12 +159,12 @@ export default function ProductEditPage() {
 
     return (
         <AdminOnly>
-            <div className="max-w-4xl mx-auto bg-white border shadow-lg rounded-xl p-8 mt-8">
-                <h1 className="text-3xl font-bold mb-8">
+            <div className="bg-white border shadow-lg rounded-xl p-6">
+                <h1 className="text-2xl font-bold mb-4">
                     ✏️ Edit Product
                 </h1>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block mb-2 font-medium">
                             Product Title

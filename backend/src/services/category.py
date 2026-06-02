@@ -28,7 +28,16 @@ async def create_category(session: AsyncSession, category: CategoryCreate):
 
 
 async def get_all_categories(session: AsyncSession):
-    return await CategoryRepository.get_all(session=session)
+    categories = await CategoryRepository.get_all(session=session)
+    return [
+        {
+            "id": category.id,
+            "name": category.name,
+            "slug": category.slug,
+            "products_count": len(category.products),
+        }
+        for category in categories
+    ]
 
 
 async def delete_category(session: AsyncSession, category_id: int):

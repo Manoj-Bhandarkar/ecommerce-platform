@@ -171,7 +171,7 @@ export default function OrdersPage() {
                 disabled={cancellingId === order.id}
                 className={`px-4 py-2 rounded text-white transition ${cancellingId === order.id
                   ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-red-500 hover:bg-red-600'
+                  : 'bg-red-500 hover:bg-red-600 cursor-pointer'
                   }`}
               >
                 {cancellingId === order.id ? 'Cancelling...' : 'Cancel Order'}

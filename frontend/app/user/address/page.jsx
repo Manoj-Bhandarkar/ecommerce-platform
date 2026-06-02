@@ -43,7 +43,7 @@ export default function AddressPage() {
     if (error) return <div className="p-6 text-red-600">{error}</div>
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="p-6">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">
                     My Addresses
@@ -95,21 +95,21 @@ export default function AddressPage() {
                                     </p>
                                 </div>
 
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 items-center">
                                     <button
                                         onClick={() =>
                                             router.push(
                                                 `/user/address/edit/${addr.id}`
                                             )
                                         }
-                                        className="text-blue-600 font-medium cursor-pointer"
+                                        className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded cursor-pointer"
                                     >
                                         EDIT
                                     </button>
 
                                     <button
                                         onClick={() => handleDelete(addr.id)}
-                                        className="text-red-600 font-medium cursor-pointer"
+                                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded cursor-pointer"
                                     >
                                         DELETE
                                     </button>

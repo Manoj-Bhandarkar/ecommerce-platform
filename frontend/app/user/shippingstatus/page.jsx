@@ -72,7 +72,7 @@ const AdminShippingUpdateStatusPage = () => {
 
     return (
         <AdminOnly>
-            <div className="max-w-6xl mx-auto mt-10 p-4">
+            <div className="p-6">
                 <h1 className="text-3xl font-bold mb-6">All Orders & Shipping Status</h1>
 
                 {/* Filters */}
@@ -82,7 +82,7 @@ const AdminShippingUpdateStatusPage = () => {
                         <select
                             value={filterStatus}
                             onChange={handleFilterChange}
-                            className="border rounded px-3 py-1"
+                            className="border rounded px-3 py-1 cursor-pointer"
                         >
                             <option value="">All</option>
                             {shippingOptions.map((status) => (
@@ -102,7 +102,7 @@ const AdminShippingUpdateStatusPage = () => {
                         />
                         <button
                             onClick={handleUserSearch}
-                            className="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700"
+                            className="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700 cursor-pointer"
                         >
                             Search
                         </button>
@@ -117,11 +117,11 @@ const AdminShippingUpdateStatusPage = () => {
                             <div className="flex justify-between items-center mb-2">
                                 <h2 className="text-xl font-semibold">Order #{order.id}</h2>
                                 <div className="flex items-center gap-3">
-                                    <span className={`px-2 py-1 rounded text-sm font-semibold ${statusColors[order.shipping_status?.status]}`}>
+                                    <span className={`px-2 py-1 rounded text-sm font-semibold  ${statusColors[order.shipping_status?.status]}`}>
                                         {order.shipping_status?.status?.toUpperCase()}
                                     </span>
                                     <select
-                                        className="border rounded px-2 py-1 text-sm"
+                                        className="border rounded px-2 py-1 text-sm cursor-pointer"
                                         value={order.shipping_status?.status || ""}
                                         onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
                                     >

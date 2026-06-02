@@ -110,14 +110,14 @@ export default function ProductList() {
                                 <div className="flex gap-2 items-center">
                                     <Link
                                         href={`/user/product/edit/${product.slug}`}
-                                        className="px-3 py-1 bg-blue-600 text-white rounded"
+                                        className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded cursor-pointer"
                                     >
                                         Edit
                                     </Link>
 
                                     <button
                                         onClick={() => handleDelete(product.id)}
-                                        className="px-3 py-1 bg-red-600 text-white rounded"
+                                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded cursor-pointer"
                                     >
                                         Delete
                                     </button>

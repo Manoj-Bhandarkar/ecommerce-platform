@@ -25,6 +25,7 @@ export default function Sidebar() {
         ...(user?.is_admin ? [
             { name: "Dashboard", href: "/user/dashboard" },
             { name: "Product List", href: "/user/product" },
+            { name: "Category List", href: "/user/category" },
             { name: "Update Shipping Status", href: "/user/shippingstatus" },
 
         ] : []),

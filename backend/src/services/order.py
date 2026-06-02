@@ -193,7 +193,7 @@ async def all_placed_order(
         .options(
             selectinload(Order.order_items).selectinload(OrderItem.product),
             selectinload(Order.shipping_status),
-        )
+        ).order_by(Order.created_at.desc())
     )
 
     # Filter by user if provided

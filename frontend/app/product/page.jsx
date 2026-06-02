@@ -11,7 +11,7 @@ const ProductPage = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
 
-  const limit = 5
+  const limit = 21
 
   const fetchProducts = async () => {
     setLoading(true)

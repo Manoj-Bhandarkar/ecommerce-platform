@@ -89,7 +89,7 @@ const ProductCreatePage = () => {
 
   return (
     <AdminOnly>
-      <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow">
+      <div className="p-6 bg-white rounded-xl shadow">
         <h1 className="text-2xl font-bold mb-4">➕ Add New Product</h1>
 
         {error && <p className="text-red-600 mb-4">{error}</p>}

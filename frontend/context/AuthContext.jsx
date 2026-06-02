@@ -58,22 +58,35 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-const register = async (data) => {
-  try {
-    setLoading(true);
-    const res = await api.post("/api/v1/account/register", data);
-    return res.data; // 💡 CRITICAL: Ensure this data extraction payload return exists
-  } catch (err) {
-    console.error("Registration endpoint error:", err);
-    throw err;
-  } finally {
-    setLoading(false);
-  }
-};
+  const register = async (data) => {
+    try {
+      setLoading(true);
+      const res = await api.post("/api/v1/account/register", data);
+      return res.data; // 💡 CRITICAL: Ensure this data extraction payload return exists
+    } catch (err) {
+      console.error("Registration endpoint error:", err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
   useEffect(() => {
+    const publicRoutes = [
+      "/",
+      "/login",
+      "/register"
+    ];
+
+    if (
+      typeof window !== "undefined" &&
+      publicRoutes.includes(window.location.pathname)
+    ) {
+      setLoading(false);
+      return;
+    }
     fetchUser();
   }, [fetchUser]);
 

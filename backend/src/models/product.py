@@ -1,5 +1,6 @@
 from decimal import Decimal
 from sqlalchemy import String, Numeric, Text
+import re
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.db.base import Base
 from src.models.common import TimestampMixin
@@ -44,3 +45,12 @@ class Product(TimestampMixin, Base):
         "OrderItem",
         back_populates="product",
     )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not self.slug and self.title:
+            self.slug = (
+                re.sub(r"[^a-z0-9\s-]", "", self.title.lower())
+                .strip()
+                .replace(" ", "-")
+            )

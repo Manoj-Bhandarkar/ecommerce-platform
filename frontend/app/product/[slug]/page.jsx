@@ -55,7 +55,8 @@ const ProductDetailPage = () => {
       <div className="grid md:grid-cols-2 gap-6">
         {/* Product Image */}
         <img
-          src={product.image_url ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${product.image_url.replace(/\\/g, '/')}` : '/placeholder-image.jpg'}
+          //src={product.image_url ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${product.image_url.replace(/\\/g, '/')}` : '/placeholder-image.jpg'}
+          src={product.image_url?.startsWith("http") ? product.image_url : `${process.env.NEXT_PUBLIC_API_BASE_URL}/${product.image_url}`}
           alt={product.title}
           className="w-full h-64 object-cover rounded"
         />

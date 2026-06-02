@@ -12,4 +12,5 @@ class CategoryCreate(CategoryBase):
 class CategoryOut(CategoryBase):
     id: int
     slug: str
+    products_count: int | None = 0
     model_config = {"from_attributes": True}

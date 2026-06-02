@@ -54,7 +54,7 @@ const Navbar = () => {
                   href="/user/dashboard" 
                   className={`hover:text-blue-600 transition-colors ${pathname === "/user/dashboard" ? "font-semibold text-blue-600" : ""}`}
                 >
-                  Admin Dashboard
+                  Dashboard
                 </Link>
               ) : (
                 <Link 
