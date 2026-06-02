@@ -133,13 +133,24 @@ export default function OrdersPage() {
             <h3 className="font-medium">🚚 Shipping Status</h3>
 
             <div className="flex justify-between items-center mb-2">
-              <p className="font-sm text-gray-600 mb-2">
-                {order.shipping_status.status}
-              </p>
-              <span className="text-sm text-gray-600 mb-2">
-                Updated: {new Date(order.shipping_status.updated_at).toLocaleString()}
-              </span>
-            </div>  
+              {order.shipping_status ? (
+                <>
+                  <p className="font-sm text-gray-600 mb-2">
+                    {order.shipping_status.status}
+                  </p>
+                  <p className="font-sm text-gray-600 mb-2">
+                    Shipping status not available
+                  </p>
+                  <span className="text-sm text-gray-600 mb-2">
+                    Updated: {new Date(order.shipping_status.updated_at).toLocaleString()}
+                  </span>
+                </>
+              ) : (
+                <p className="font-sm text-gray-600 mb-2">
+                  Shipping status not available
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Items */}
@@ -165,7 +176,7 @@ export default function OrdersPage() {
             <p className="font-semibold text-lg">
               Total: ₹{order.total_price}
             </p>
-            {order.shipping_status.status === 'pending' && (
+            {order.shipping_status?.status === 'pending' && (
               <button
                 onClick={() => cancelOrder(order.id)}
                 disabled={cancellingId === order.id}

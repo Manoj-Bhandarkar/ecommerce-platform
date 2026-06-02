@@ -12,6 +12,7 @@ const CheckoutPage = () => {
     const [selectedGateway, setSelectedGateway] = useState('mock')
     const [loading, setLoading] = useState(true)
     const [placingOrder, setPlacingOrder] = useState(false)
+    const [error, setError] = useState(null)
 
     const { user, loading: authLoading } = useAuth()
     const router = useRouter()
@@ -36,11 +37,11 @@ const CheckoutPage = () => {
 
     const handleCheckout = async () => {
         if (!selectedAddressId) {
-            alert("Please select a shipping address.")
+            setError("Please select a shipping address.")
             return
         }
         if (!selectedGateway) {
-            alert("Please select a payment gateway.")
+            setError("Please select a payment gateway.")
             return
         }
         setPlacingOrder(true)
@@ -49,12 +50,15 @@ const CheckoutPage = () => {
                 amount: cart.total_price,
                 shipping_address_id: selectedAddressId,
                 gateway: selectedGateway,
-                simulate_success: true,
+                simulate_success: false,
             })
             router.push("/user/order")
         } catch (err) {
-            console.error("Checkout failed:", err)
-            alert("Checkout failed. Try again.")
+            if (err.response) {
+                if (err.response.status === 400) {
+                    setError("Checkout failed. Try again.")
+                }
+            }
         }
     }
 
@@ -273,6 +277,11 @@ const CheckoutPage = () => {
                             </div>
 
                             <div className="p-4 bg-gray-50">
+                                {error && (
+                                    <div className="mb-4 p-2 test-sm text-red-700 bg-red-100 rounded">
+                                        {error}
+                                    </div>
+                                )}
                                 <button
                                     onClick={handleCheckout}
                                     disabled={placingOrder}
