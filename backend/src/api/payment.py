@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.dependencies.current_user import get_current_user
 from src.models.user import User
 from src.core.database import SessionDep
-from src.services.payment import get_payment_by_order_id, list_payments_by_user
-from src.schemas.payment import PaymentOut
+from src.services.payment import get_payment_by_order_id, handle_razorpay_callback, list_payments_by_user
+from src.schemas.payment import PaymentOut, RazorpayCallback
 
 router = APIRouter()
 
@@ -28,3 +28,10 @@ async def get_all_payments_by_user(
     session: SessionDep, user: User = Depends(get_current_user)
 ):
     return await list_payments_by_user(session, user.id)
+
+@router.post("/razorpay-callback")
+async def razorpay_callback(
+    session: SessionDep, payload: RazorpayCallback
+):
+    return await handle_razorpay_callback(session, payload)
+    

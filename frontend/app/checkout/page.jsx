@@ -17,6 +17,13 @@ const CheckoutPage = () => {
     const { user, loading: authLoading } = useAuth()
     const router = useRouter()
 
+    useEffect(() => {
+        const script = document.createElement("script")
+        script.src = "https://checkout.razorpay.com/v1/checkout.js"
+        script.async = true
+        document.body.appendChild(script)
+    }, [])
+
     const fetchCartAndAddresses = async () => {
         try {
             const [cartRes, addrRes] = await Promise.all([
@@ -46,13 +53,51 @@ const CheckoutPage = () => {
         }
         setPlacingOrder(true)
         try {
-            await api.post("/api/v1/order/checkout", {
+            const res = await api.post("/api/v1/order/checkout", {
                 amount: cart.total_price,
                 shipping_address_id: selectedAddressId,
                 gateway: selectedGateway,
-                simulate_success: false,
+                simulate_success: true,
             })
-            router.push("/user/order")
+            const data = res.data
+            if (selectedGateway === "razorpay") {
+                const options = {
+                    key: data.razorpay_data.razorpay_key,
+                    amount: data.razorpay_data.amount,
+                    currency: data.razorpay_data.currency,
+                    name: "E-Commerce Store",
+                    description: "Test Transaction",
+                    order_id: data.razorpay_data.pg_order_id,
+                    prefill: {
+                        name: user.name,
+                        email: user.email,
+                        contact: user.phone_number || "",
+                    },
+                    notes: {
+                        "address": "Razorpay Corporate Office",
+                    },
+                    theme: {
+                        color: "#2874f0",
+                    },
+                    handler: async function (response) {
+                        try {
+                            const verifyRes = await api.post("/api/v1/payment/razorpay-callback", response)
+                            if (verifyRes.data.status === 'success') {
+                                router.push("/user/order")
+                            }
+                            else {
+                                setError("Payment verification failed. Please contact support.")
+                            }
+                        } catch (err) {
+                            setError("Payment verification failed. Please contact support.")
+                        }
+                    },
+                }
+                const rzp = new Razorpay(options)
+                rzp.open()
+            } else {
+                router.push("/user/order")
+            }
         } catch (err) {
             if (err.response) {
                 if (err.response.status === 400) {

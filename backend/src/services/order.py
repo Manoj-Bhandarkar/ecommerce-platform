@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.schemas.order import OrderOut
 from src.models.payment import PaymentStatusEnum
 from src.models.order import Order, OrderStatusEnum
 from src.models.user import User
@@ -20,7 +21,7 @@ from src.services.payment import create_payment
 
 async def checkout(
     session: AsyncSession, user: User, payment_data: PaymentCreate
-) -> Order:
+) -> dict:
     user = await session.scalar(select(User).where(User.id == user.id))
     if not user:
         raise HTTPException(
@@ -82,25 +83,13 @@ async def checkout(
         status=OrderStatusEnum.pending,
     )
     await OrderRepository.create_order(session=session, order=order)
-    payment = await create_payment(
+    payment_res = await create_payment(
         session=session,
         data=payment_data,
         user_id=user.id,
-        order_id=order.id,
+        order=order,
     )
-    if not payment.is_paid:
-        order.status = OrderStatusEnum.cancelled
-        await session.commit()
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Payment failed",
-        )
-    order.status = OrderStatusEnum.confirmed
-    shipping_status = ShippingStatus(
-        order_id=order.id,
-        status=ShippingStatusEnum.pending,
-    )
-    session.add(shipping_status)
+
     for oi in order_items:
         oi.order_id = order.id
         session.add(oi)
@@ -112,7 +101,14 @@ async def checkout(
             product.stock_quantity -= oi.quantity
     await CartRepository.clear_cart_items(session=session, cart_items=cart_items)
     await session.commit()
-    return await OrderRepository.get_order_by_id(session=session, order_id=order.id)
+    order_obj = await OrderRepository.get_order_by_id(
+        session=session, order_id=order.id
+    )
+    return {
+        "order": OrderOut.model_validate(order_obj),
+        "payment": payment_res.payment,
+        "razorpay_data": payment_res.razorpay_data,
+    }
 
 
 async def get_placed_order_for_user(
@@ -193,7 +189,8 @@ async def all_placed_order(
         .options(
             selectinload(Order.order_items).selectinload(OrderItem.product),
             selectinload(Order.shipping_status),
-        ).order_by(Order.created_at.desc())
+        )
+        .order_by(Order.created_at.desc())
     )
 
     # Filter by user if provided

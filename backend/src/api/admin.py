@@ -59,7 +59,9 @@ async def get_dashboard_stats(
             {
                 "id": order.id,
                 "total_price": order.total_price,
-                "status": order.shipping_status.status,
+                "status": (
+                    order.shipping_status.status if order.shipping_status else "None"
+                ),
                 "created_at": order.created_at.isoformat(),
             }
             for order in recent_orders

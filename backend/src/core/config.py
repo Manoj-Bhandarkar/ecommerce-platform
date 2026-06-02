@@ -24,11 +24,15 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "FastAPI E-Commerce Backend"
     API_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://store.manojbhandarkar.cloud"]
 
     EMAIL_VERIFICATION_TOKEN_TIME_HOUR: int
     EMAIL_PASSWORD_RESET_TOKEN_TIME_HOUR: int
     FRONTEND_URL: str
+
+    RAZORPAY_KEY: str
+    RAZORPAY_KEY_SECRET: str
+    RAZORPAY_CALLBACK_URL: str
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

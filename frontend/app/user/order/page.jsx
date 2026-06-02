@@ -100,17 +100,21 @@ export default function OrdersPage() {
               {order.status}
             </span>
           </div>
-          <div className="flex justify-between items-center mb-2">
-            <p className="font-bold text-gray-600 mb-2">
-              {order.shipping_address.name}
-            </p>
-            <span className="text-sm text-gray-600 mb-2">
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col gap-1">
+              <h3 className="font-bold text-xl">
+                {order.shipping_address.name}
+              </h3>
+
+              <p className="text-gray-600 m-0">
+                Email: {order.email}
+              </p>
+            </div>
+
+            <p className="text-gray-600">
               Placed on: {new Date(order.created_at).toLocaleString()}
-            </span>
+            </p>
           </div>
-          <p className="text-sm text-gray-600">
-            Email: {order.email}
-          </p>
 
 
           {/* Shipping Address */}
@@ -132,21 +136,18 @@ export default function OrdersPage() {
           <div className="mb-3">
             <h3 className="font-medium">🚚 Shipping Status</h3>
 
-            <div className="flex justify-between items-center mb-2">
+            <div className="mb-2">
               {order.shipping_status ? (
-                <>
-                  <p className="font-sm text-gray-600 mb-2">
+                <div className="flex justify-between items-center">
+                  <p className="font-sm text-yellow-600 mb-2 capitalize ">
                     {order.shipping_status.status}
                   </p>
-                  <p className="font-sm text-gray-600 mb-2">
-                    Shipping status not available
-                  </p>
-                  <span className="text-sm text-gray-600 mb-2">
+                  <span className="text-sm text-gray-600">
                     Updated: {new Date(order.shipping_status.updated_at).toLocaleString()}
                   </span>
-                </>
+                </div>
               ) : (
-                <p className="font-sm text-gray-600 mb-2">
+                <p className="font-sm text-gray-600 mt-2">
                   Shipping status not available
                 </p>
               )}

@@ -16,7 +16,7 @@ from src.schemas.payment import PaymentCreate
 router = APIRouter()
 
 
-@router.post("/checkout", response_model=OrderOut)
+@router.post("/checkout")
 async def checkout_order(
     session: SessionDep,
     payment_data: PaymentCreate,

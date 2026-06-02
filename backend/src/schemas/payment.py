@@ -21,3 +21,14 @@ class PaymentOut(BaseModel):
     pg_order_id: str | None
     pg_payment_id: str | None
     model_config = {"from_attributes": True}
+
+
+class PaymentWithPG(BaseModel):
+    payment: PaymentOut
+    razorpay_data: dict | None = None
+
+
+class RazorpayCallback(BaseModel):
+    razorpay_payment_id: str
+    razorpay_order_id: str
+    razorpay_signature: str
