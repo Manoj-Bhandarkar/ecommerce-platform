@@ -1,4 +1,4 @@
-<img width="1536" height="1024" alt="E-R Diagram" src="https://github.com/user-attachments/assets/c1c4d8b4-766c-426a-936f-a6ac662fa75d" />﻿# 🛒 E-Commerce Platform
+# 🛒 E-Commerce Platform
 
 A full-stack E-Commerce application built with **FastAPI**, **Next.js**, **PostgreSQL**, **Redis**, **Celery**, and **Docker**. The platform provides a complete shopping experience with secure authentication, product management, order processing, payment integration, shipping tracking, and an admin dashboard.
 
