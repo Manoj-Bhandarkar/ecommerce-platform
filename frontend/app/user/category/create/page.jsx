@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/utils/axios';
 import AdminOnly from '@/components/AdminOnly';
 
-const CreateCategoryPage = () => {
+export default function CreateCategoryPage() {
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -13,17 +13,27 @@ const CreateCategoryPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!name.trim()) {
+      setError('Category name is required.');
+      return;
+    }
+
     setError(null);
     setIsSubmitting(true);
 
     try {
-      await api.post('/api/v1/categories/', { name });
+      await api.post('/api/v1/categories/', {
+        name: name.trim(),
+      });
+
       router.push('/user/category');
     } catch (err) {
-      console.error('Failed to create category:', err);
+      console.error(err);
+
       setError(
-        err.response?.data?.detail || 
-        'Failed to establish new catalog category metrics.'
+        err.response?.data?.detail ||
+        'Failed to create category.'
       );
     } finally {
       setIsSubmitting(false);
@@ -32,98 +42,79 @@ const CreateCategoryPage = () => {
 
   return (
     <AdminOnly>
-      <div className="bg-[#0B0F19] min-h-[85vh] text-white p-6 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Dynamic Ambient Glow Backmesh Overlay */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
+      <div className="bg-[#0B0F19] min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-8 py-8 relative overflow-hidden">
+        {/* Background Glow */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-emerald-500/5 blur-[120px]" />
+        </div>
 
-        {/* Focused Panel Envelope Block */}
-        <div className="w-full max-w-md bg-[#111625] rounded-3xl border border-white/[0.04] p-8 sm:p-10 shadow-2xl space-y-6 relative z-10">
-          
-          {/* Header Block Row Container */}
-          <div className="flex justify-between items-center border-b border-white/[0.04] pb-4">
-            <div className="space-y-1">
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
+        {/* Card */}
+        <div className="relative z-10 w-full max-w-lg bg-[#111625] border border-white/[0.04] rounded-3xl p-5 sm:p-8 md:p-10 shadow-2xl">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/[0.04] pb-5">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-white">
                 ➕ Create Category
-              </h2>
-              <p className="text-xs text-slate-400 font-light">Deploy fresh structural taxonomies into the core catalog matrix.</p>
+              </h1>
+
+              <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                Add a new category to organize products.
+              </p>
             </div>
 
             <button
               type="button"
               onClick={() => router.push('/user/category')}
-              className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer select-none"
+              className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-emerald-400 transition"
             >
-              ← Cancel
+              ← Back
             </button>
           </div>
 
-          {/* Dynamic Server Error Banner Alerts */}
+          {/* Error */}
           {error && (
-            <div className="p-4 text-xs text-rose-400 bg-rose-500/10 rounded-xl border border-rose-500/20 font-medium tracking-wide leading-relaxed animate-pulse">
+            <div className="mt-6 p-4 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-400 text-sm">
               ⚠️ {error}
             </div>
           )}
 
-          {/* Input Submission Pipeline Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Category Name *</label>
+          {/* Form */}
+          <form
+            onSubmit={handleSubmit}
+            className="mt-6 space-y-5"
+          >
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                Category Name
+              </label>
+
               <input
-                name="name"
                 type="text"
-                placeholder="e.g., Ultra-Gadgets, Summer-Capitals"
+                placeholder="Electronics"
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
                   setError(null);
                 }}
-                className="w-full px-4 py-3 bg-slate-950/40 text-slate-100 placeholder-slate-600 border border-white/[0.04] focus:border-emerald-500/50 rounded-xl text-sm transition-all duration-300 outline-none shadow-inner disabled:opacity-40"
                 disabled={isSubmitting}
                 required
+                className="w-full px-4 py-3 rounded-xl bg-slate-950/40 border border-white/[0.04] text-white placeholder-slate-600 outline-none focus:border-emerald-500/50 transition"
               />
             </div>
 
-            {/* Premium Emerald CTA Trigger Button Element */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="
-                w-full
-                mt-2
-                bg-gradient-to-r
-                from-emerald-500
-                to-teal-500
-                hover:from-emerald-400
-                hover:to-teal-400
-                text-slate-950
-                py-3.5
-                rounded-xl
-                font-black
-                text-xs
-                uppercase
-                tracking-wider
-                text-center
-                transition-all
-                duration-300
-                shadow-xl
-                shadow-emerald-500/10
-                hover:scale-[1.01]
-                active:scale-[0.99]
-                disabled:opacity-20
-                disabled:cursor-not-allowed
-                disabled:hover:scale-100
-                cursor-pointer
-                block
-              "
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 shadow-lg shadow-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Deploying Taxonomy Keys..." : "Initialize New Category"}
+              {isSubmitting
+                ? 'Creating Category...'
+                : 'Create Category'}
             </button>
           </form>
-
         </div>
       </div>
     </AdminOnly>
   );
-};
-
-export default CreateCategoryPage;
+}

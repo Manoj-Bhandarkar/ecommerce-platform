@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '@/utils/axios';
 import AdminOnly from '@/components/AdminOnly';
+
 const ProductEditPage = () => {
     const router = useRouter();
     const params = useParams();
@@ -58,8 +59,7 @@ const ProductEditPage = () => {
                     setPreviewUrl(formattedUrl);
                 }
             } catch (err) {
-                console.error('Failed loading product details:', err);
-                setError('Failed to extract product configuration parameters.');
+                setError('Failed to load product.');
             } finally {
                 setLoading(false);
             }
@@ -68,23 +68,9 @@ const ProductEditPage = () => {
         fetchData();
     }, [slug]);
 
-    // Clean memory garbage buffers securely when blob assets switch frames
-    useEffect(() => {
-        let currentUrl = previewUrl;
-
-        return () => {
-            if (currentUrl?.startsWith('blob:')) {
-                URL.revokeObjectURL(currentUrl);
-            }
-        };
-    }, [previewUrl]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm(prev => ({
-            ...prev,
-            [name]: value,
-        }));
+        setForm(prev => ({ ...prev, [name]: value }));
         setError('');
     };
 
@@ -101,29 +87,15 @@ const ProductEditPage = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        setForm(prev => ({
-            ...prev,
-            image: file,
-        }));
-
-        const imagePreview = URL.createObjectURL(file);
-        setPreviewUrl(imagePreview);
+        setForm(prev => ({ ...prev, image: file }));
+        setPreviewUrl(URL.createObjectURL(file));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!productId) return;
-        if (!form.title.trim()) {
-            setError('Product title is required.');
-            return;
-        }
 
-        if (form.categories.length === 0) {
-            setError('Please select at least one category.');
-            return;
-        }
         setIsSubmitting(true);
-        setError('');
 
         try {
             const formData = new FormData();
@@ -133,12 +105,11 @@ const ProductEditPage = () => {
             formData.append('price', form.price);
             formData.append('stock_quantity', form.stock_quantity);
 
-            form.categories.forEach(catId => {
-                formData.append('category_ids', String(catId));
+            form.categories.forEach(id => {
+                formData.append('category_ids', String(id));
             });
-            if (form.image) {
-                formData.append('image', form.image);
-            }
+
+            if (form.image) formData.append('image', form.image);
 
             await api.patch(`/api/v1/product/${productId}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -146,8 +117,7 @@ const ProductEditPage = () => {
 
             router.push('/user/product');
         } catch (err) {
-            console.error('Update failed operational sequence:', err);
-            setError(err.response?.data?.detail || 'Failed to sync modifications back to database catalog.');
+            setError('Update failed.');
         } finally {
             setIsSubmitting(false);
         }
@@ -156,11 +126,8 @@ const ProductEditPage = () => {
     if (loading) {
         return (
             <AdminOnly>
-                <div className="bg-[#0B0F19] min-h-[85vh] text-slate-400 flex items-center justify-center font-medium tracking-wide">
-                    <div className="flex flex-col items-center gap-3">
-                        <span className="w-8 h-8 rounded-full border-2 border-emerald-400/20 border-t-emerald-400 animate-spin" />
-                        <p className="text-xs uppercase font-black tracking-widest text-slate-500">Decrypting Product Allocation Records...</p>
-                    </div>
+                <div className="min-h-screen flex items-center justify-center bg-[#0B0F19] text-slate-400 px-4">
+                    Loading...
                 </div>
             </AdminOnly>
         );
@@ -168,154 +135,123 @@ const ProductEditPage = () => {
 
     return (
         <AdminOnly>
-            <div className="bg-[#0B0F19] min-h-screen text-white p-6 sm:p-8 md:p-12 flex flex-col items-center justify-center relative overflow-hidden">
-                {/* Ambient Glow Graphic Layer */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-emerald-500/5 blur-[130px] pointer-events-none" />
+            <div className="min-h-screen bg-[#0B0F19] text-white px-4 sm:px-6 md:px-10 py-6 flex justify-center">
+                <div className="w-full max-w-3xl bg-[#111625] rounded-2xl p-4 sm:p-6 md:p-10 border border-white/5">
 
-                {/* Structural Form Wrap Block */}
-                <div className="w-full max-w-2xl bg-[#111625] rounded-3xl border border-white/[0.04] shadow-2xl p-6 sm:p-10 space-y-6 relative z-10">
-
-                    {/* Header Row Bar */}
-                    <div className="flex justify-between items-center border-b border-white/[0.04] pb-4">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-3 border-b border-white/10 pb-4">
                         <div>
-                            <h2 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
-                                ✏️ Edit Product
-                            </h2>
-                            <p className="text-xs text-slate-400 font-light mt-0.5">Modify inventory details, stock targets, and category slots.</p>
+                            <h2 className="text-lg sm:text-xl font-bold">Edit Product</h2>
+                            <p className="text-xs text-slate-400">Update product details</p>
                         </div>
 
                         <button
-                            type="button"
                             onClick={() => router.push('/user/product')}
-                            className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer select-none"
+                            className="text-xs text-slate-400 hover:text-emerald-400 text-left sm:text-right"
                         >
-                            ← Cancel
+                            Cancel
                         </button>
                     </div>
 
-                    {/* Error Banner Callout */}
                     {error && (
-                        <div className="p-4 text-xs text-rose-400 bg-rose-500/10 rounded-xl border border-rose-500/20 font-medium tracking-wide leading-relaxed animate-pulse">
-                            ⚠️ {error}
+                        <div className="mt-4 text-xs text-red-400 bg-red-500/10 p-3 rounded">
+                            {error}
                         </div>
                     )}
 
-                    {/* Form Processing Input Deck */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Product Title *</label>
-                                <input
-                                    type="text"
-                                    name="title"
-                                    value={form.title}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-slate-950/40 text-slate-100 border border-white/[0.04] focus:border-emerald-500/50 rounded-xl text-sm transition-all duration-300 outline-none shadow-inner"
-                                    required
-                                />
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">SKU Identifier *</label>
-                                <input
-                                    type="text"
-                                    name="sku"
-                                    value={form.sku}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-slate-950/40 text-slate-100 border border-white/[0.04] focus:border-emerald-500/50 rounded-xl text-sm transition-all duration-300 outline-none shadow-inner font-mono"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-1.5">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Description Overview *</label>
-                            <textarea
-                                name="description"
-                                rows={4}
-                                value={form.description}
+                        {/* Title + SKU */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                                name="title"
+                                value={form.title}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-slate-950/40 text-slate-100 border border-white/[0.04] focus:border-emerald-500/50 rounded-xl text-sm transition-all duration-300 outline-none shadow-inner resize-none leading-relaxed"
-                                required
+                                placeholder="Product Title"
+                                className="w-full p-3 rounded bg-black/30 border border-white/10 text-sm"
+                            />
+
+                            <input
+                                name="sku"
+                                value={form.sku}
+                                onChange={handleChange}
+                                placeholder="SKU"
+                                className="w-full p-3 rounded bg-black/30 border border-white/10 text-sm"
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Price Valuation (INR) *</label>
-                                <input
-                                    type="number"
-                                    name="price"
-                                    value={form.price}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-slate-950/40 text-slate-100 border border-white/[0.04] focus:border-emerald-500/50 rounded-xl text-sm transition-all duration-300 outline-none shadow-inner font-mono"
-                                    required
-                                />
-                            </div>
+                        {/* Description */}
+                        <textarea
+                            name="description"
+                            value={form.description}
+                            onChange={handleChange}
+                            rows={4}
+                            placeholder="Description"
+                            className="w-full p-3 rounded bg-black/30 border border-white/10 text-sm"
+                        />
 
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Stock Quantity *</label>
-                                <input
-                                    type="number"
-                                    name="stock_quantity"
-                                    value={form.stock_quantity}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-slate-950/40 text-slate-100 border border-white/[0.04] focus:border-emerald-500/50 rounded-xl text-sm transition-all duration-300 outline-none shadow-inner font-mono"
-                                    required
-                                />
-                            </div>
+                        {/* Price + Stock */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input
+                                type="number"
+                                name="price"
+                                value={form.price}
+                                onChange={handleChange}
+                                placeholder="Price"
+                                className="w-full p-3 rounded bg-black/30 border border-white/10 text-sm"
+                            />
+
+                            <input
+                                type="number"
+                                name="stock_quantity"
+                                value={form.stock_quantity}
+                                onChange={handleChange}
+                                placeholder="Stock"
+                                className="w-full p-3 rounded bg-black/30 border border-white/10 text-sm"
+                            />
                         </div>
 
-                        {/* Category Cluster Select Checkboxes */}
-                        <div className="space-y-2">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Taxonomy Category Mappings *</label>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {allCategories.map(cat => {
-                                    const isChecked = form.categories.includes(cat.id);
-                                    return (
-                                        <label
-                                            key={cat.id}
-                                            className={`flex items-center gap-3 border rounded-xl p-3.5 cursor-pointer transition-all duration-300 select-none text-xs uppercase font-bold tracking-wider ${isChecked ? 'border-emerald-500 bg-emerald-500/5 text-emerald-400' : 'border-white/[0.04] bg-slate-950/10 text-slate-400 hover:border-white/[0.1]'}`}
-                                        >
-                                            <input type="checkbox" checked={isChecked} className="accent-emerald-400 w-3.5 h-3.5 cursor-pointer" onChange={() => handleCategoryToggle(cat.id)} />
-                                            {cat.name}
-                                        </label>
-                                    )
-                                })
-                                }
-
-                            </div>
-                        </div>
-                        {/* Image Section */}
-                        <div className="space-y-2">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-                                Product Image
-                            </label>
-
-                            <div className="flex items-center gap-4">
-                                {previewUrl && (
-                                    <img
-                                        src={previewUrl}
-                                        alt="Preview"
-                                        className="w-28 h-28 object-cover rounded-xl border border-white/[0.04]"
+                        {/* Categories */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {allCategories.map(cat => (
+                                <label
+                                    key={cat.id}
+                                    className="flex items-center gap-2 text-xs p-2 border border-white/10 rounded"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={form.categories.includes(cat.id)}
+                                        onChange={() => handleCategoryToggle(cat.id)}
                                     />
-                                )}
-
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    className="flex-1 text-sm text-slate-300 border border-white/[0.04] bg-slate-950/40 rounded-xl p-3"
-                                />
-                            </div>
+                                    {cat.name}
+                                </label>
+                            ))}
                         </div>
+
+                        {/* Image */}
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                            {previewUrl && (
+                                <img
+                                    src={previewUrl}
+                                    className="w-24 h-24 object-cover rounded"
+                                />
+                            )}
+
+                            <input
+                                type="file"
+                                onChange={handleImageChange}
+                                className="text-sm w-full"
+                            />
+                        </div>
+
+                        {/* Submit */}
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 py-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 shadow-xl shadow-emerald-500/10 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-emerald-500 text-black font-bold py-3 rounded text-sm"
                         >
-                            {isSubmitting ? 'Updating Product...' : 'Update Product'}
+                            {isSubmitting ? 'Updating...' : 'Update Product'}
                         </button>
 
                     </form>

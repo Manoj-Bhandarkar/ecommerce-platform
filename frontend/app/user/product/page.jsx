@@ -84,16 +84,16 @@ export default function ProductList() {
 
     return (
         <AdminOnly>
-            <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white p-6 sm:p-8 md:p-12 relative overflow-hidden">
+            <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white px-4 py-6 sm:px-6 md:px-8 lg:px-12 xl:px-12 xl:px-16 relative overflow-hidden">
                 {/* Dynamic Background Blur Mesh Layer */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-emerald-500/5 blur-[130px] pointer-events-none" />
 
-                <div className="container mx-auto max-w-5xl space-y-6 relative z-10">
+                <div className="container mx-auto max-w-7xl space-y-6 relative z-10">
 
                     {/* Header Row Bar Block */}
                     <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-white/[0.04] pb-6">
                         <div>
-                            <h1 className="text-2xl font-black tracking-tight flex items-center gap-3">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight flex items-center gap-3">
                                 📦 Inventory Products
                             </h1>
                             <p className="text-xs text-slate-400 font-light mt-0.5">
@@ -127,10 +127,10 @@ export default function ProductList() {
                                 return (
                                     <div
                                         key={product.id}
-                                        className="admin-product-row bg-[#111625] border border-white/[0.04] p-5 rounded-2xl flex flex-col sm:flex-row gap-5 hover:border-white/[0.1] hover:shadow-xl shadow-black/10 transition-all duration-300 opacity-0"
+                                        className="admin-product-row bg-[#111625] border border-white/[0.04] p-4 sm:p-5 lg:p-6 rounded-2xl flex flex-col md:flex-row gap-4lg:gap-6 hover:border-white/[0.1] hover:shadow-xl shadow-black/10 transition-all duration-300 opacity-0"
                                     >
                                         {/* Media Display Asset Block */}
-                                        <div className="w-24 h-24 relative bg-slate-950/40 rounded-xl p-2 border border-white/[0.02] flex items-center justify-center flex-shrink-0 self-center sm:self-start">
+                                        <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 relative bg-slate-950/40 rounded-xl p-2 border border-white/[0.02] flex items-center justify-center flex-shrink-0 self-center sm:self-start">
                                             <Image
                                                 src={productImgUrl}
                                                 alt={product.title || "Product Thumbnail"}
@@ -142,16 +142,16 @@ export default function ProductList() {
                                         </div>
 
                                         {/* Metadata Content Descriptions Frame */}
-                                        <div className="flex-1 space-y-1.5 text-center sm:text-left">
+                                        <div className="flex-1 space-y-2 text-center md:text-left min-w-0">
                                             <div className="space-y-0.5">
-                                                <h2 className="text-lg font-bold text-slate-200 tracking-tight line-clamp-1">{product.title}</h2>
+                                                <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-200 tracking-tight line-clamp-2">{product.title}</h2>
                                                 <p className="text-xs font-mono text-slate-500 font-semibold">
                                                     SKU Identifier: <span className="text-slate-400">{product.sku || "N/A"}</span>
                                                 </p>
                                             </div>
-                                            <p className="text-xs text-slate-400 font-light line-clamp-2 max-w-2xl leading-relaxed">{product.description}</p>
+                                            <p className="text-xs sm:text-sm text-slate-400 font-light line-clamp-3 max-w-2xl leading-relaxed">{product.description}</p>
 
-                                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-1 text-sm font-medium">
+                                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 pt-2 text-sm font-medium">
                                                 <span className="font-mono font-black text-slate-200">₹{Number(product.price).toLocaleString('en-IN')}</span>
                                                 <span className="text-slate-700 font-light">|</span>
                                                 <span
@@ -165,7 +165,7 @@ export default function ProductList() {
                                             </div>
 
                                             {/* Category Pills Map row */}
-                                            <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 pt-1">
+                                            <div className="flex flex-wrap justify-center md:justify-start gap-2 pt-2">
                                                 {product.categories?.map((cat) => (
                                                     <span
                                                         key={cat.id}
@@ -178,17 +178,17 @@ export default function ProductList() {
                                         </div>
 
                                         {/* Modification Action Clusters Column */}
-                                        <div className="flex sm:flex-col items-center justify-center gap-2 border-t sm:border-t-0 border-white/[0.02] pt-4 sm:pt-0 shrink-0 w-full sm:w-auto">
+                                        <div className="flex flex-col sm:flex-row sm:flex-col items-center justify-center gap-2 border-t sm:border-t-0 border-white/[0.02] pt-4 md:pt-0 shrink-0 w-full md:w-auto md:min-w-[120px]">
                                             <Link
                                                 href={`/user/product/edit/${product.slug}`}
-                                                className="w-full sm:w-20 px-3 py-2 text-center rounded-xl text-xs font-black uppercase tracking-wider bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200 cursor-pointer"
+                                                className="w-full md:w-24 px-4 py-2.5 text-center rounded-xl text-xs font-black uppercase tracking-wider bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200 cursor-pointer"
                                             >
                                                 Edit
                                             </Link>
 
                                             <button
                                                 onClick={() => handleDelete(product.id)}
-                                                className="w-full sm:w-20 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white hover:border-transparent transition-all duration-200 cursor-pointer"
+                                                className="w-full md:w-24 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white hover:border-transparent transition-all duration-200 cursor-pointer"
                                             >
                                                 Delete
                                             </button>
@@ -202,14 +202,14 @@ export default function ProductList() {
 
                     {/* Premium Glassmorph Pagination Control Footers */}
                     {products.length > 0 && (
-                        <div className="flex justify-between items-center pt-8 border-t border-white/[0.04] select-none text-xs">
+                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-white/[0.04] select-none">
                             <button
                                 onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                                 disabled={page === 1 || loading}
                                 className="px-4 py-2 rounded-xl uppercase tracking-wider font-black bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-emerald-500 hover:text-slate-950 hover:border-transparent disabled:opacity-20 transition-all duration-300 cursor-pointer disabled:cursor-not-allowed">
                                 ⬅ Prev
                             </button>
-                            <p className="text-gray-700">
+                            <p className="text-slate-400 text-sm font-medium">
                                 Page {page} of {totalPages}
                             </p>
                             <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} disabled={page === totalPages || loading} className="px-4 py-2 rounded-xl uppercase tracking-wider font-black bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-emerald-500 hover:text-slate-950 hover:border-transparent disabled:opacity-20 transition-all duration-300 cursor-pointer disabled:cursor-not-allowed">

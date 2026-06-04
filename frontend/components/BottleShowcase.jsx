@@ -81,10 +81,10 @@ export default function BottleShowcase() {
 
                 <div
                     ref={bottleRef}
-                    className="bottle-wrapper relative"
+                    className="bottle-wrapper relative w-[100px] sm:w-[130px] md:w-[160px]"
                 >
                     {/* Glow */}
-                    <div className="absolute inset-0 bg-emerald-500/20 blur-[120px] rounded-full scale-75" />
+                    <div className="absolute inset-0 bg-emerald-500/20 blur-[80px] rounded-full scale-75" />
 
                     <Image
                         src="/showcase-bottle.png"

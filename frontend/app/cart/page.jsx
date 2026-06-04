@@ -80,8 +80,8 @@ const CartPage = () => {
 
   return (
     <div className="bg-[#0B0F19] min-h-screen text-white pb-24 pt-6">
-      <div className="container mx-auto px-6 max-w-7xl">
-        <h1 className="text-3xl font-black tracking-tight mb-8 flex items-center gap-3">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-8 flex items-center gap-3">
           🛒 Your Cart Drop
         </h1>
 
@@ -99,12 +99,12 @@ const CartPage = () => {
               return (
                 <div
                   key={item.id}
-                  className={`bg-[#111625] border border-white/[0.04] p-5 rounded-2xl flex gap-6 shadow-xl transition-opacity duration-200 ${isItemBusy ? 'opacity-40 pointer-events-none' : 'opacity-100'
+                  className={`bg-[#111625] border border-white/[0.04] p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row gap-4 sm:gap-6 shadow-xl transition-opacity duration-200 ${isItemBusy ? 'opacity-40 pointer-events-none' : 'opacity-100'
                     }`}
                 >
                   {/* Left Block: Media Display & Responsive Counter */}
-                  <div className="w-28 flex-shrink-0 flex flex-col items-center">
-                    <div className="w-24 h-24 relative bg-slate-950/40 rounded-xl p-2 border border-white/[0.02] flex items-center justify-center">
+                  <div className="w-full sm:w-28 flex-shrink-0 flex flex-col items-center">
+                    <div className="w-24 h-24 sm:w-24 sm:h-24 relative bg-slate-950/40 rounded-xl p-2 border border-white/[0.02] flex items-center justify-center">
                       <Image
                         src={itemImageUrl}
                         alt={item.product_title || "Product Image"}
@@ -152,12 +152,12 @@ const CartPage = () => {
                   </div>
 
                   {/* Right Block: Details Meta Content Workspace */}
-                  <div className="flex flex-col justify-between flex-grow py-1">
+                  <div className="flex flex-col justify-between flex-grow py-1 min-w-0">
                     <div className="space-y-2">
-                      <h2 className="font-bold text-slate-200 text-base tracking-tight leading-snug line-clamp-2">
+                      <h2 className="font-bold text-slate-200 text-sm sm:text-base tracking-tight leading-snug line-clamp-2 break-words">
                         {item.product_title}
                       </h2>
-                      <div className="flex items-baseline gap-2">
+                      <div className="flex flex-wrap flex-wrap items-baseline gap-2">
                         <span className="text-xl font-black text-white font-mono">
                           ₹{Number(item.price).toLocaleString('en-IN')}
                         </span>
@@ -168,10 +168,8 @@ const CartPage = () => {
                     </div>
 
                     {/* Operational Destruct Actions */}
-                    <div className="flex gap-6 mt-4 text-[11px] font-black uppercase tracking-wider">
-                      <button className="text-slate-500 hover:text-emerald-400 transition-colors cursor-pointer">
-                        Save For Later
-                      </button>
+                    <div className="flex flex-wrap gap-4 sm:gap-6 mt-4 text-[11px] font-black uppercase tracking-wider">
+
 
                       <button
                         onClick={() =>
@@ -195,7 +193,7 @@ const CartPage = () => {
 
           {/* RIGHT CONTAINER: Price Details Balance Sheet Panel */}
           <div className="lg:col-span-4">
-            <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl overflow-hidden sticky top-24">
+            <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl overflow-hidden lg:sticky lg:top-24">
               <div className="border-b border-white/[0.04] px-6 py-4 text-xs font-black uppercase tracking-widest text-slate-400">
                 Price Details
               </div>
@@ -224,9 +222,9 @@ const CartPage = () => {
               {/* Checkout Routing Trigger Button */}
               <button
                 onClick={() => router.push("/checkout")}
-                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 py-4 rounded-xl font-black text-xs uppercase tracking-wider text-center transition-all duration-300 shadow-xl shadow-emerald-500/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer block"
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 py-3 sm:py-4 rounded-xl font-black text-xs uppercase tracking-wider text-center transition-all duration-300 shadow-xl shadow-emerald-500/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer block"
               >
-                Proceed to Checkout Matrix
+                Proceed to Checkout
               </button>
             </div>
           </div>

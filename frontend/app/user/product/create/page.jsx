@@ -93,7 +93,7 @@ const ProductCreatePage = () => {
 
         {/* Focused Max-Width Form Envelope Container */}
         <div className="w-full max-w-2xl bg-[#111625] rounded-3xl border border-white/[0.04] shadow-2xl p-6 sm:p-10 space-y-6 relative z-10">
-          
+
           {/* Header Block Row */}
           <div className="flex justify-between items-center border-b border-white/[0.04] pb-4">
             <div>
@@ -121,7 +121,7 @@ const ProductCreatePage = () => {
 
           {/* Core Configuration Input Forms Pipeline */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Product Title *</label>
@@ -237,38 +237,58 @@ const ProductCreatePage = () => {
             </div>
 
 
-          <div>
-            <label className="block mb-2 font-medium text-gray-700">
-              Product Image 
-            </label>
+            {/* Product Image Upload */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
+                Product Image
+              </label>
 
-            <div className="flex items-center gap-4">
-              {preview && (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="w-28 h-28 object-cover rounded-md border shadow-sm"
-                />
-              )}
+              <div className="border border-white/[0.04] rounded-2xl p-4 bg-slate-950/20">
+                <div className="flex flex-col sm:flex-row items-center gap-4">
 
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleChange}
-                className="text-sm border rounded p-2 flex-1"
-              />
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="w-32 h-32 object-cover rounded-xl border border-white/[0.04] shrink-0"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 rounded-xl border border-dashed border-white/[0.08] flex items-center justify-center text-slate-500 text-xs text-center">
+                      No Image
+                    </div>
+                  )}
+
+                  <div className="flex-1 w-full">
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/*"
+                      onChange={handleChange}
+                      className="w-full text-sm text-slate-400 file:mr-4 file:px-4 file:py-2 file:rounded-xl file:border-0 file:bg-emerald-500/10 file:text-emerald-400 file:font-bold file:cursor-pointer cursor-pointer"
+                    />
+
+                    <p className="text-[11px] text-slate-500 mt-2">
+                      JPG, PNG, WEBP supported.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
             </div>
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className={`bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 ${loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-          >
-            {loading ? 'Creating...' : 'Create Product'}
-          </button>
-        </form>
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 py-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 shadow-xl shadow-emerald-500/10 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
+              >
+                {loading
+                  ? 'Deploying Product Profile...'
+                  : 'Create Product'}
+              </button>
+            </div>
+          </form>
         </div>
 
       </div>

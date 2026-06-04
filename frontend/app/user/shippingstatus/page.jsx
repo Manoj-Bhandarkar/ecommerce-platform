@@ -80,15 +80,15 @@ const AdminShippingUpdateStatusPage = () => {
 
     return (
         <AdminOnly>
-            <div className="bg-[#0B0F19] min-h-screen text-white p-6 sm:p-8 md:p-12 relative overflow-hidden">
+            <div className="bg-[#0B0F19] min-h-screen text-white px-4 py-6 sm:px-6 md:px-8 lg:px-12 xl:px-16 relative overflow-hidden">
                 {/* Ambient Radial Backmesh Layer */}
                 <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-emerald-500/5 blur-[140px] pointer-events-none" />
 
-                <div className="container mx-auto max-w-5xl space-y-8 relative z-10">
+                <div className="container mx-auto max-w-7xl space-y-8 relative z-10">
 
                     {/* Header Block Title */}
                     <div className="border-b border-white/[0.04] pb-6">
-                        <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-3">
+                        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight flex items-center gap-3">
                             🚚 Dispatch & Fulfillment Management
                         </h1>
                         <p className="text-xs text-slate-400 font-light mt-1">
@@ -97,8 +97,8 @@ const AdminShippingUpdateStatusPage = () => {
                     </div>
 
                     {/* Filters Management Row Grid */}
-                    <div className="mb-6 flex flex-wrap items-center gap-6 bg-[#111625] border border-white/[0.04] p-5 rounded-2xl shadow-xl">
-                        <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-wider text-slate-400">
+                    <div className="mb-6 flex flex-col lg:flex-row lg:items-center gap-6 bg-[#111625] border border-white/[0.04] p-4 sm:p-5 lg:p-6 rounded-2xl shadow-xl">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm font-bold uppercase tracking-wider text-slate-400 w-full lg:w-auto">
                             <label className="select-none">Shipping Filter:</label>
                             <select
                                 value={filterStatus}
@@ -123,9 +123,9 @@ const AdminShippingUpdateStatusPage = () => {
                         </div>
 
 
-                        <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-wider text-slate-400 flex-1 min-w-[280px]">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm font-bold uppercase tracking-wider text-slate-400 flex-1 w-full">
                             <label className="select-none">User Query ID:</label>
-                            <div className="flex gap-2 flex-1 max-w-xs items-center">
+                            <div className="flex flex-col sm:flex-row gap-2 flex-1 w-full sm:max-w-md items-stretch">
                                 <input
                                     type="number"
                                     placeholder="e.g. 104"
@@ -159,10 +159,10 @@ const AdminShippingUpdateStatusPage = () => {
                             {orders.map((order) => (
                                 <div
                                     key={order.id}
-                                    className="bg-[#111625] rounded-3xl border border-white/[0.04] p-6 sm:p-8 shadow-2xl space-y-6"
+                                    className="bg-[#111625] rounded-3xl border border-white/[0.04] p-4 sm:p-6 lg:p-8 shadow-2xl space-y-6"
                                 >
                                     {/* Header */}
-                                    <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-white/[0.04] pb-4 gap-4">
+                                    <div className="flex flex-col lg:flex-row justify-between lg:items-center border-b border-white/[0.04] pb-4 gap-4">
                                         <div>
                                             <h2 className="text-lg font-black text-slate-200 font-mono">
                                                 Allocation #{order.id}
@@ -179,7 +179,7 @@ const AdminShippingUpdateStatusPage = () => {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                                             <span
                                                 className={`px-3 py-1.5 rounded-xl text-[9px] uppercase tracking-widest font-black border ${statusColors[
                                                     order.shipping_status?.status?.toLowerCase()
@@ -207,7 +207,7 @@ const AdminShippingUpdateStatusPage = () => {
                                     </div>
 
                                     {/* Address */}
-                                    <div className="grid md:grid-cols-2 gap-6 text-sm">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-sm">
                                         <div>
                                             <h4 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
                                                 📍 Destination Logistics
@@ -224,7 +224,7 @@ const AdminShippingUpdateStatusPage = () => {
                                             </p>
                                         </div>
 
-                                        <div className="md:text-right text-xs font-mono text-slate-500">
+                                        <div className="lg:text-right text-xs font-mono text-slate-500">
                                             Deployment Request:
                                             <br />
                                             {new Date(order.created_at).toLocaleString("en-IN")}
@@ -232,8 +232,8 @@ const AdminShippingUpdateStatusPage = () => {
                                     </div>
 
                                     {/* Products */}
-                                    <div className="overflow-x-auto rounded-xl border border-white/[0.04]">
-                                        <table className="w-full text-sm">
+                                    <div className="overflow-x-auto rounded-xl border border-white/[0.04] w-full">
+                                        <table className="min-w-[600px] w-full text-sm">
                                             <thead className="bg-slate-900">
                                                 <tr>
                                                     <th className="p-3 text-left">Product</th>
@@ -272,7 +272,7 @@ const AdminShippingUpdateStatusPage = () => {
                                     </div>
 
                                     {/* Total */}
-                                    <div className="flex justify-end">
+                                    <div className="flex justify-center sm:justify-end">
                                         <div className="text-right">
                                             <p className="text-xs uppercase text-slate-500">
                                                 Order Total

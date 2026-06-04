@@ -163,7 +163,7 @@ const CheckoutPage = () => {
 
     return (
         <div className="bg-[#0B0F19] min-h-screen text-white pb-24 pt-6">
-            <div className="container mx-auto px-6 max-w-7xl">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
 
                 {error && (
                     <div className="mb-6 p-4 text-xs text-rose-400 bg-rose-500/10 rounded-xl border border-rose-500/20 font-medium tracking-wide flex items-center gap-2 animate-pulse">
@@ -178,11 +178,11 @@ const CheckoutPage = () => {
 
                         {/* BOX 1: DELIVERY LOGISTICS */}
                         <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl overflow-hidden">
-                            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-white/[0.04] px-6 py-4 flex items-center gap-3">
+                            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-white/[0.04] px-4 sm:px-6 py-4 flex items-center gap-3">
                                 <span className="bg-emerald-400 text-slate-950 w-5 h-5 flex items-center justify-center text-xs font-black rounded-md">
                                     1
                                 </span>
-                                <span className="font-black uppercase text-xs tracking-wider text-slate-200">
+                                <span className="font-black uppercase text-xs tracking-wider text-slate-200 px-4 sm:px-6">
                                     Delivery Destination
                                 </span>
                             </div>
@@ -210,7 +210,7 @@ const CheckoutPage = () => {
 
                                         <button
                                             onClick={() => setIsModalOpen(true)}
-                                            className="px-4 py-2 self-start rounded-xl text-xs uppercase font-black tracking-wider bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-emerald-400 hover:text-slate-950 hover:border-transparent transition-all duration-300 cursor-pointer"
+                                            className="w-full sm:w-auto px-4 py-2 self-start rounded-xl text-xs uppercase font-black tracking-wider bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-emerald-400 hover:text-slate-950 hover:border-transparent transition-all duration-300 cursor-pointer"
                                         >
                                             Change Address
                                         </button>
@@ -228,7 +228,7 @@ const CheckoutPage = () => {
 
                         {/* BOX 2: GATEWAY INTERACTIVE CONFIGURATOR */}
                         <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl overflow-hidden">
-                            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-white/[0.04] px-6 py-4 flex items-center gap-3">
+                            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-white/[0.04] px-4 sm:px-6 py-4 flex items-center gap-3">
                                 <span className="bg-emerald-400 text-slate-950 w-5 h-5 flex items-center justify-center text-xs font-black rounded-md">
                                     2
                                 </span>
@@ -237,7 +237,7 @@ const CheckoutPage = () => {
                                 </span>
                             </div>
                             <div className="p-6 space-y-4">
-                                <div className="flex items-center gap-4">
+                                <div className="flex flex-col sm:flex-row gap-4">
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
                                             type="radio"
@@ -273,17 +273,17 @@ const CheckoutPage = () => {
 
                     {/* RIGHT COLUMN: Order Summary */}
                     <div className="lg:col-span-4">
-                        <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl p-6">
+                        <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl p-4 sm:p-6 lg:sticky lg:top-24">
                             <h2 className="text-lg font-black tracking-wide mb-4">Order Summary</h2>
                             <div className="space-y-4">
                                 {cart.items.map(item => (
-                                    <div key={item.id} className="flex items-center gap-4">
-                                        <img src={item.product_image} alt={item.product_name} className="w-16 h-16 object-cover rounded-md" />
+                                    <div key={item.id} className="flex gap-3 sm:gap-4 items-start">
+                                        <img src={item.product_image} alt={item.product_name} className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0" />
                                         <div className="flex-1">
-                                            <h3 className="text-sm font-medium">{item.product_name}</h3>
+                                            <h3 className="text-xs sm:text-sm font-medium break-words">{item.product_name}</h3>
                                             <p className="text-xs text-slate-500">Qty: {item.quantity}</p>
                                         </div>
-                                        <span className="text-sm font-bold text-emerald-400">₹{(item.unit_price * item.quantity).toLocaleString('en-IN')}   </span>
+                                        <span className="text-xs sm:text-sm font-bold text-emerald-400 whitespace-nowrap">₹{(item.unit_price * item.quantity).toLocaleString('en-IN')}   </span>
                                     </div>
                                 ))}
                             </div>
@@ -296,7 +296,7 @@ const CheckoutPage = () => {
                                 <button
                                     onClick={handleCheckout}
                                     disabled={placingOrder}
-                                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider py-3 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider py-3 sm:py-4 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {placingOrder ? "Processing..." : "Place Order"}
                                 </button>
@@ -308,9 +308,9 @@ const CheckoutPage = () => {
                 {/* ADDRESS SELECTION MODAL */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                        <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl p-6 w-full max-w-md">
+                        <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl p-4 sm:p-6 w-[95%] max-w-md">
                             <h2 className="text-lg font-black tracking-wide mb-4">Select Shipping Address</h2>
-                            <div className="space-y-4 max-h-80 overflow-y-auto">
+                            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
                                 {addresses.map(addr => (
                                     <div
                                         key={addr.id}
@@ -321,7 +321,7 @@ const CheckoutPage = () => {
                                         className={`p-4 rounded-xl border cursor-pointer transition-colors ${selectedAddressId === addr.id ? 'border-emerald-400 bg-emerald-500/10' : 'border-white/[0.04] hover:bg-white/[0.02]'}`}
                                     >
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="font-bold text-slate-200 text-base">{addr.name}</span>
+                                            <span className="font-bold text-slate-200 text-sm sm:text-base break-words">{addr.name}</span>
                                             <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-[9px] font-black rounded-md uppercase tracking-wider">
                                                 {addr.address_type || "HOME"}
                                             </span>
