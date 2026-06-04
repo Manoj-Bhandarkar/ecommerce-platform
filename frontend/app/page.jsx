@@ -9,7 +9,7 @@ import { useGSAP } from "@gsap/react";
 import PremiumHero from "@/components/PremiumHero";
 import FeaturedCategories from "@/components/FeaturedCategories";
 import ProductCard from "@/components/ProductCard";
-
+import BottleShowcase from "@/components/BottleShowcase";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
@@ -82,7 +82,7 @@ export default function Home() {
     <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white pb-24 space-y-24 overflow-hidden">
       {/* Premium Hero Stage Component */}
       <PremiumHero />
-      
+          <BottleShowcase /> 
       {/* Featured Categories Carousel Grid */}
       <FeaturedCategories />
 
