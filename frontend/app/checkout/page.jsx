@@ -1,353 +1,357 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import api from "@/utils/axios"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import api from "@/utils/axios";
 
 const CheckoutPage = () => {
-    const [cart, setCart] = useState(null)
-    const [addresses, setAddresses] = useState([])
-    const [selectedAddressId, setSelectedAddressId] = useState(null)
-    const [selectedGateway, setSelectedGateway] = useState('mock')
-    const [loading, setLoading] = useState(true)
-    const [placingOrder, setPlacingOrder] = useState(false)
-    const [error, setError] = useState(null)
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
 
-    const { user, loading: authLoading } = useAuth()
-    const router = useRouter()
+    const [cart, setCart] = useState(null);
+    const [addresses, setAddresses] = useState([]);
+    const [selectedAddressId, setSelectedAddressId] = useState(null);
+    const [selectedGateway, setSelectedGateway] = useState('mock');
+    const [loading, setLoading] = useState(true);
+    const [placingOrder, setPlacingOrder] = useState(false);
+    const [error, setError] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Load Razorpay Script Safely into DOM Pipeline
     useEffect(() => {
-        const script = document.createElement("script")
-        script.src = "https://checkout.razorpay.com/v1/checkout.js"
-        script.async = true
-        document.body.appendChild(script)
-    }, [])
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        document.body.appendChild(script);
+    }, []);
 
     const fetchCartAndAddresses = async () => {
         try {
             const [cartRes, addrRes] = await Promise.all([
                 api.get("/api/v1/cart"),
                 api.get("/api/v1/shipping/address"),
-            ])
-            setCart(cartRes.data)
-            setAddresses(addrRes.data)
-            if (addrRes.data.length > 0) {
-                setSelectedAddressId(addrRes.data[0].id)
+            ]);
+            setCart(cartRes.data);
+            setAddresses(addrRes.data || []);
+            if (addrRes.data && addrRes.data.length > 0) {
+                setSelectedAddressId(addrRes.data[0].id);
             }
         } catch (err) {
-            console.error("Error loading checkout data:", err)
+            console.error("Error loading checkout data:", err);
+            setError("Failed to coordinate secure checkout assets.");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
+
+    useEffect(() => {
+        if (!authLoading) {
+            if (!user) {
+                router.push("/login?redirect=/checkout");
+            } else {
+                fetchCartAndAddresses();
+            }
+        }
+    }, [authLoading, user]);
 
     const handleCheckout = async () => {
         if (!selectedAddressId) {
-            setError("Please select a shipping address.")
-            return
+            setError("Please select a shipping address.");
+            return;
         }
         if (!selectedGateway) {
-            setError("Please select a payment gateway.")
-            return
+            setError("Please select a payment gateway.");
+            return;
         }
-        setPlacingOrder(true)
+
+        setError(null);
+        setPlacingOrder(true);
+
         try {
             const res = await api.post("/api/v1/order/checkout", {
                 amount: cart.total_price,
                 shipping_address_id: selectedAddressId,
                 gateway: selectedGateway,
                 simulate_success: true,
-            })
-            const data = res.data
+            });
+
+            const data = res.data;
+
             if (selectedGateway === "razorpay") {
+                if (typeof window === 'undefined' || !window.Razorpay) {
+                    setError("Razorpay secure terminal failed to init. Refresh the dashboard.");
+                    setPlacingOrder(false);
+                    return;
+                }
+
                 const options = {
                     key: data.razorpay_data.razorpay_key,
                     amount: data.razorpay_data.amount,
                     currency: data.razorpay_data.currency,
-                    name: "E-Commerce Store",
-                    description: "Test Transaction",
+                    name: "Manoj Cart Drops",
+                    description: "Premium Digital Checkout",
                     order_id: data.razorpay_data.pg_order_id,
                     prefill: {
-                        name: user.name,
-                        email: user.email,
+                        name: user.name || "",
+                        email: user.email || "",
                         contact: user.phone_number || "",
                     },
-                    notes: {
-                        "address": "Razorpay Corporate Office",
-                    },
                     theme: {
-                        color: "#2874f0",
+                        color: "#10B981",
                     },
                     handler: async function (response) {
                         try {
-                            const verifyRes = await api.post("/api/v1/payment/razorpay-callback", response)
+                            const verifyRes = await api.post("/api/v1/payment/razorpay-callback", response);
                             if (verifyRes.data.status === 'success') {
-                                router.push("/user/order")
-                            }
-                            else {
-                                setError("Payment verification failed. Please contact support.")
+                                router.push("/user/order");
+                            } else {
+                                setError("Payment verification signatures mismatched. Contact Support.");
                             }
                         } catch (err) {
-                            setError("Payment verification failed. Please contact support.")
+                            setError("Payment network authorization loop failed.");
                         }
                     },
-                }
-                const rzp = new Razorpay(options)
-                rzp.open()
+                };
+
+                const rzp = new window.Razorpay(options);
+                rzp.open();
             } else {
-                router.push("/user/order")
+                router.push("/user/order");
             }
         } catch (err) {
-            if (err.response) {
-                if (err.response.status === 400) {
-                    setError("Checkout failed. Try again.")
-                }
-            }
+            console.error("Checkout operational error:", err);
+            setError(err.response?.data?.detail || "Checkout operation sequence failed.");
+        } finally {
+            setPlacingOrder(false);
         }
-    }
-
-    useEffect(() => {
-        if (!authLoading) {
-            if (!user) {
-                router.push("/login?redirect=/checkout")
-            } else {
-                fetchCartAndAddresses()
-            }
-        }
-    }, [authLoading, user])
+    };
 
     if (loading || authLoading) {
         return (
-            <div className="text-center py-8 text-gray-600">Loading checkout...</div>
-        )
+            <div className="bg-[#0B0F19] min-h-screen text-slate-400 flex items-center justify-center font-medium tracking-wide">
+                <div className="flex flex-col items-center gap-3">
+                    <span className="w-8 h-8 rounded-full border-2 border-emerald-400/20 border-t-emerald-400 animate-spin" />
+                    <p className="text-xs uppercase font-black tracking-widest text-slate-500">Authorizing Checkout Matrix...</p>
+                </div>
+            </div>
+        );
     }
-    const selectedAddress =
-        addresses.find(addr => addr.id === selectedAddressId)
 
-    if (!cart || cart.items.length === 0) {
+    const selectedAddress = addresses.find(addr => addr.id === selectedAddressId);
+
+    if (!cart || !cart.items || cart.items.length === 0) {
         return (
-            <div className="text-center py-8 text-gray-600">
-                <div className="text-center py-16">
-                    <div className="text-6xl mb-4">🛒</div>
-                    <h2 className="text-2xl font-semibold">Your Cart is Empty</h2>
+            <div className="bg-[#0B0F19] min-h-screen text-white flex items-center justify-center p-6">
+                <div className="text-center max-w-sm space-y-6 bg-[#111625] p-10 rounded-3xl border border-white/[0.04] shadow-2xl">
+                    <div className="text-5xl select-none animate-bounce">🛒</div>
+                    <div className="space-y-1">
+                        <h2 className="text-xl font-black tracking-tight">Your Cart is Empty</h2>
+                        <p className="text-xs text-slate-400 font-light">No active allocations are currently reserved under your profile.</p>
+                    </div>
                     <button
                         onClick={() => router.push('/product')}
-                        className="mt-4 bg-blue-600 text-white px-6 py-2 rounded"
+                        className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider py-3 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/10 cursor-pointer block"
                     >
                         Continue Shopping
                     </button>
                 </div>
             </div>
-        )
+        );
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="bg-[#0B0F19] min-h-screen text-white pb-24 pt-6">
+            <div className="container mx-auto px-6 max-w-7xl">
 
-                {/* LEFT SECTION */}
-                <div className="lg:col-span-8 space-y-4">
-
-                    {/* DELIVERY ADDRESS */}
-                    <div className="bg-white border border-gray-200 shadow-sm">
-                        {/* Header */}
-                        <div className="bg-[#2874f0] text-white px-4 py-3 flex items-center gap-3">
-                            <span className="bg-white text-[#2874f0] w-5 h-5 flex items-center justify-center text-xs font-bold">
-                                1
-                            </span>
-                            <span className="font-medium uppercase text-sm">
-                                Delivery Address
-                            </span>
-                        </div>
-
-                        {/* Selected Address */}
-                        <div className="p-4">
-                            {selectedAddress && (
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <p className="text-sm text-gray-500 mb-1">
-                                            Deliver to:
-                                        </p>
-
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="font-semibold">
-                                                {selectedAddress.name}
-                                            </span>
-
-                                            <span className="bg-gray-100 px-2 py-1 text-xs font-medium rounded">
-                                                HOME
-                                            </span>
-                                        </div>
-
-                                        <p className="mt-2 text-sm text-gray-700">
-                                            {selectedAddress.address_line1}
-                                            {selectedAddress.address_line2 &&
-                                                `, ${selectedAddress.address_line2}`}
-                                            , {selectedAddress.city},
-                                            {" "}
-                                            {selectedAddress.state}
-                                            {" "}
-                                            {selectedAddress.pin_code}
-                                        </p>
-
-                                        <p className="text-sm text-gray-700 mt-1">
-                                            {selectedAddress.phone_number}
-                                        </p>
-                                    </div>
-
-                                    <button
-                                        onClick={() =>
-                                            document
-                                                .getElementById("address-modal")
-                                                ?.showModal()
-                                        }
-                                        className="border border-blue-500 text-blue-600 px-5 py-2 rounded text-sm font-medium"
-                                    >
-                                        CHANGE
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                {error && (
+                    <div className="mb-6 p-4 text-xs text-rose-400 bg-rose-500/10 rounded-xl border border-rose-500/20 font-medium tracking-wide flex items-center gap-2 animate-pulse">
+                        ⚠️ {error}
                     </div>
+                )}
 
-                    {/* ORDER SUMMARY */}
-                    <div className="bg-white border border-gray-200 shadow-sm">
-                        <div className="bg-[#2874f0] text-white px-4 py-3 flex items-center gap-3">
-                            <span className="bg-white text-[#2874f0] w-5 h-5 flex items-center justify-center text-xs font-bold">
-                                2
-                            </span>
-                            <span className="font-medium uppercase text-sm">
-                                Order Summary
-                            </span>
-                        </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-                        <div className="divide-y">
-                            {cart.items.map(item => (
-                                <div
-                                    key={item.id}
-                                    className="p-4 flex gap-4"
-                                >
-                                    <img
-                                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${item.product_image}`}
-                                        alt={item.product_title}
-                                        className="w-28 h-28 object-contain"
-                                    />
+                    {/* LEFT COLUMN: Checkout Sections */}
+                    <div className="lg:col-span-8 space-y-6">
 
-                                    <div className="flex-1">
-                                        <h3 className="font-medium">
-                                            {item.product_title}
-                                        </h3>
-
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            Qty: {item.quantity}
-                                        </p>
-
-                                        <div className="mt-2">
-                                            <span className="font-semibold text-lg">
-                                                ₹{item.total}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* PAYMENT OPTIONS */}
-                    <div className="bg-white border border-gray-200 shadow-sm">
-                        <div className="bg-[#2874f0] text-white px-4 py-3 flex items-center gap-3">
-                            <span className="bg-white text-[#2874f0] w-5 h-5 flex items-center justify-center text-xs font-bold">
-                                3
-                            </span>
-                            <span className="font-medium uppercase text-sm">
-                                Payment Options
-                            </span>
-                        </div>
-
-                        <div className="divide-y">
-                            <label className="flex items-center gap-3 p-4 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    checked={selectedGateway === "mock"}
-                                    onChange={() => setSelectedGateway("mock")}
-                                />
-                                Mock Payment
-                            </label>
-
-                            <label className="flex items-center gap-3 p-4 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    checked={selectedGateway === "razorpay"}
-                                    onChange={() => setSelectedGateway("razorpay")}
-                                />
-                                Razorpay
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                {/* RIGHT SIDEBAR */}
-                <div className="lg:col-span-4">
-                    <div className="sticky top-4">
-
-                        <div className="bg-white border border-gray-200 shadow-sm">
-                            <div className="px-4 py-3 border-b text-gray-500 text-sm font-medium uppercase">
-                                Price Details
+                        {/* BOX 1: DELIVERY LOGISTICS */}
+                        <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl overflow-hidden">
+                            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-white/[0.04] px-6 py-4 flex items-center gap-3">
+                                <span className="bg-emerald-400 text-slate-950 w-5 h-5 flex items-center justify-center text-xs font-black rounded-md">
+                                    1
+                                </span>
+                                <span className="font-black uppercase text-xs tracking-wider text-slate-200">
+                                    Delivery Destination
+                                </span>
                             </div>
 
-                            <div className="p-4 space-y-4">
-                                <div className="flex justify-between">
-                                    <span>
-                                        Price ({cart.items.length} items)
-                                    </span>
-                                    <span>
-                                        ₹{Number(cart.total_price).toLocaleString("en-IN")}
-                                    </span>
-                                </div>
+                            <div className="p-6">
+                                {selectedAddress ? (
+                                    <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="font-bold text-slate-200 text-base">{selectedAddress.name}</span>
+                                                <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-[9px] font-black rounded-md uppercase tracking-wider">
+                                                    {selectedAddress.address_type || "HOME"}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-slate-400 font-light leading-relaxed">
+                                                {selectedAddress.address_line1}
+                                                {selectedAddress.address_line2 && `, ${selectedAddress.address_line2}`}
+                                                <br />
+                                                {selectedAddress.city}, {selectedAddress.state} — <span className="font-mono text-slate-300 font-bold">{selectedAddress.pin_code}</span>
+                                            </p>
+                                            <p className="text-xs font-medium text-slate-500 pt-1">
+                                                📞 Contact: {selectedAddress.phone_number}
+                                            </p>
+                                        </div>
 
-                                <div className="flex justify-between">
-                                    <span>Delivery Charges</span>
-                                    <span className="text-green-600">
-                                        FREE
-                                    </span>
-                                </div>
-
-                                <div className="border-t pt-4 flex justify-between font-bold">
-                                    <span>Total Amount</span>
-                                    <span>
-                                        ₹{Number(cart.total_price).toLocaleString("en-IN")}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="p-4 bg-gray-50">
-                                {error && (
-                                    <div className="mb-4 p-2 test-sm text-red-700 bg-red-100 rounded">
-                                        {error}
+                                        <button
+                                            onClick={() => setIsModalOpen(true)}
+                                            className="px-4 py-2 self-start rounded-xl text-xs uppercase font-black tracking-wider bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-emerald-400 hover:text-slate-950 hover:border-transparent transition-all duration-300 cursor-pointer"
+                                        >
+                                            Change Address
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-6 space-y-4">
+                                        <p className="text-sm text-slate-400 font-light">No shipping configurations linked under your current profile.</p>
+                                        <Link href="/user/profile" className="inline-block px-5 py-2.5 rounded-xl text-xs uppercase font-black tracking-wider bg-emerald-500 text-slate-950 transition-transform duration-300 hover:scale-105 shadow-lg shadow-emerald-500/10 font-bold">
+                                            + Add New Address
+                                        </Link>
                                     </div>
                                 )}
+                            </div>
+                        </div>
+
+                        {/* BOX 2: GATEWAY INTERACTIVE CONFIGURATOR */}
+                        <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl overflow-hidden">
+                            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-white/[0.04] px-6 py-4 flex items-center gap-3">
+                                <span className="bg-emerald-400 text-slate-950 w-5 h-5 flex items-center justify-center text-xs font-black rounded-md">
+                                    2
+                                </span>
+                                <span className="font-black uppercase text-xs tracking-wider text-slate-200">
+                                    Payment Gateway
+                                </span>
+                            </div>
+                            <div className="p-6 space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="gateway"
+                                            value="mock"
+                                            checked={selectedGateway === 'mock'}
+                                            onChange={() => setSelectedGateway('mock')}
+                                            className="peer sr-only"
+                                        />
+                                        <div className="w-5 h-5 rounded-full border-2 border-slate-500 flex items-center justify-center peer-data-[state=checked]:border-emerald-400 transition-colors">
+                                            <div className="w-3 h-3 rounded-full bg-emerald-400 opacity-0 peer-data-[state=checked]:opacity-100 transition-opacity"></div>
+                                        </div>
+                                        <span className="text-sm font-medium text-slate-300">Mock Gateway (Test Mode)</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio" name="gateway"
+                                            value="razorpay"
+                                            checked={selectedGateway === 'razorpay'}
+                                            onChange={() => setSelectedGateway('razorpay')}
+                                            className="peer sr-only"
+                                        />
+                                        <div className="w-5 h-5 rounded-full border-2 border-slate-500 flex items-center justify-center peer-data-[state=checked]:border-emerald-400 transition-colors">
+                                            <div className="w-3 h-3 rounded-full bg-emerald-400 opacity-0 peer-data-[state=checked]:opacity-100 transition-opacity"></div>
+                                        </div>
+                                        <span className="text-sm font-medium text-slate-300">Razorpay (Live Mode)</span>
+                                    </label>
+                                </div>
+                                <p className="text-xs text-slate-500 font-light">Select your preferred payment gateway for secure transaction processing.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT COLUMN: Order Summary */}
+                    <div className="lg:col-span-4">
+                        <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl p-6">
+                            <h2 className="text-lg font-black tracking-wide mb-4">Order Summary</h2>
+                            <div className="space-y-4">
+                                {cart.items.map(item => (
+                                    <div key={item.id} className="flex items-center gap-4">
+                                        <img src={item.product_image} alt={item.product_name} className="w-16 h-16 object-cover rounded-md" />
+                                        <div className="flex-1">
+                                            <h3 className="text-sm font-medium">{item.product_name}</h3>
+                                            <p className="text-xs text-slate-500">Qty: {item.quantity}</p>
+                                        </div>
+                                        <span className="text-sm font-bold text-emerald-400">₹{(item.unit_price * item.quantity).toLocaleString('en-IN')}   </span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="border-t border-white/[0.04] mt-6 pt-4">
+
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-sm text-slate-500">Total:</span>
+                                    <span className="text-lg font-bold text-emerald-400">₹{Number(cart.total_price).toLocaleString('en-IN')}</span>
+                                </div>
                                 <button
                                     onClick={handleCheckout}
                                     disabled={placingOrder}
-                                    className="w-full bg-[#fb641b] hover:bg-[#f95302] text-white py-3 font-medium"
+                                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider py-3 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {placingOrder
-                                        ? "Processing..."
-                                        : "Place Order"}
+                                    {placingOrder ? "Processing..." : "Place Order"}
                                 </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
+                {/* ADDRESS SELECTION MODAL */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                        <div className="bg-[#111625] rounded-2xl border border-white/[0.04] shadow-xl p-6 w-full max-w-md">
+                            <h2 className="text-lg font-black tracking-wide mb-4">Select Shipping Address</h2>
+                            <div className="space-y-4 max-h-80 overflow-y-auto">
+                                {addresses.map(addr => (
+                                    <div
+                                        key={addr.id}
+                                        onClick={() => {
+                                            setSelectedAddressId(addr.id);
+                                            setIsModalOpen(false);
+                                        }}
+                                        className={`p-4 rounded-xl border cursor-pointer transition-colors ${selectedAddressId === addr.id ? 'border-emerald-400 bg-emerald-500/10' : 'border-white/[0.04] hover:bg-white/[0.02]'}`}
+                                    >
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="font-bold text-slate-200 text-base">{addr.name}</span>
+                                            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-[9px] font-black rounded-md uppercase tracking-wider">
+                                                {addr.address_type || "HOME"}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-slate-400 font-light leading-relaxed">
+                                            {addr.address_line1}
+                                            {addr.address_line2 && `, ${addr.address_line2}`}
+                                            <br />
+                                            {addr.city}, {addr.state} — <span className="font-mono text-slate-300 font-bold">{addr.pin_code}</span>
+                                        </p>
+                                        <p className="text-xs font-medium text-slate-500 pt-1">
+                                            📞 Contact: {addr.phone_number}
+                                        </p>
+                                    </div>
+                                ))}
+                                {addresses.length === 0 && (
+                                    <p className="text-sm text-slate-400 font-light text-center">No shipping addresses found. Please add one in your profile.</p>
+                                )}
+                            </div>
+                            <button
+                                onClick={() => router.push('/user/profile')}
+                                className="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider py-3 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/10"
+                            >
+                                Manage Addresses
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
-
         </div>
-
-    )
-
+    );
 }
-
-export default CheckoutPage
+export default CheckoutPage;

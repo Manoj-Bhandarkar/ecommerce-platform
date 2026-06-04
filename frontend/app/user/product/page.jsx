@@ -1,155 +1,227 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import api from '@/utils/axios'
-import Link from 'next/link'
-import AdminOnly from '@/components/AdminOnly'
+import { useEffect, useState, useRef } from 'react';
+import api from '@/utils/axios';
+import Link from 'next/link';
+import Image from 'next/image';
+import AdminOnly from '@/components/AdminOnly';
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
+// Internal Shimmer Loader layout component declared safely inside the single-file scope
+const AdminProductPageLoader = () => (
+    <div className="space-y-4 w-full">
+        {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-[#111625] p-5 rounded-2xl border border-white/[0.04] flex gap-5 animate-pulse">
+                <div className="bg-slate-950/40 w-24 h-24 rounded-xl flex-shrink-0" />
+                <div className="flex-1 space-y-3 py-1">
+                    <div className="h-4 bg-slate-800 rounded w-1/3" />
+                    <div className="h-3 bg-slate-800 rounded w-2/3" />
+                    <div className="h-3 bg-slate-800 rounded w-1/4" />
+                </div>
+            </div>
+        ))}
+    </div>
+);
 
 export default function ProductList() {
-    const [products, setProducts] = useState([])
-    const [page, setPage] = useState(1)
-    const [limit] = useState(5)
-    const [totalPages, setTotalPages] = useState(1)
-    const [loading, setLoading] = useState(false)
+    const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(1);
+    const [limit] = useState(5);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(true);
+
+    const containerRef = useRef(null);
 
     const fetchProducts = async () => {
-        setLoading(true)
+        setLoading(true);
         try {
-            const res = await api.get(`/api/v1/product?limit=${limit}&page=${page}`)
-            setProducts(res.data.items)
-            setTotalPages(Math.ceil(res.data.total / res.data.limit))
+            const res = await api.get(`/api/v1/product?limit=${limit}&page=${page}`);
+            setProducts(res.data?.items || []);
+            setTotalPages(Math.ceil((res.data?.total || 0) / (res.data?.limit || limit)) || 1);
         } catch (err) {
-            console.error('Failed to fetch products:', err)
+            console.error('Failed to fetch products:', err);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
-        fetchProducts()
-    }, [page])
+        fetchProducts();
+    }, [page]);
+
+    // Premium GSAP Stagger Reveal Entry Engine
+    useGSAP(() => {
+        if (loading || products.length === 0) return;
+
+        gsap.fromTo('.admin-product-row',
+            { opacity: 0, y: 20 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                stagger: 0.06,
+                ease: "power2.out"
+            }
+        );
+    }, { scope: containerRef, dependencies: [loading, products] });
 
     const handleDelete = async (id) => {
-        if (!confirm('Delete this product?')) return
+        if (!confirm('Are you absolutely certain you want to purge this product asset from the database?')) return;
         try {
-            await api.delete(`/api/v1/product/${id}`)
+            await api.delete(`/api/v1/product/${id}`);
             if (page === 1) {
-                fetchProducts()
+                fetchProducts();
             } else {
-                setPage(1)
+                setPage(1);
             }
         } catch (err) {
-            console.error('Failed to delete product:', err)
+            console.error('Failed to delete product:', err);
         }
-    }
+    };
 
-    const formatImage = (url) => url?.replace(/\\/g, '/')
+    const formatImage = (url) => url?.replace(/\\/g, '/');
 
     return (
         <AdminOnly>
-            <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">
-                        📦 Products ({products.length})
-                    </h1>
-                    <Link
-                        href="/user/product/create"
-                        className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
-                    >
-                        + Add Product
-                    </Link>
-                </div>
+            <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white p-6 sm:p-8 md:p-12 relative overflow-hidden">
+                {/* Dynamic Background Blur Mesh Layer */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-emerald-500/5 blur-[130px] pointer-events-none" />
 
-                {loading ? (
-                    <p className="text-gray-500 text-center py-10">Loading products...</p>
-                ) : products.length === 0 ? (
-                    <p className="text-gray-600 text-center py-10">No products found.</p>
-                ) : (
-                    <div className="space-y-4">
-                        {products.map((product) => (
-                            <div
-                                key={product.id}
-                                className="p-4 border rounded shadow flex gap-4 hover:shadow-lg transition-shadow"
-                            >
-                                <img
-                                    src={
-                                        product.image_url
-                                            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${formatImage(product.image_url)}`
-                                            : '/placeholder.png'
-                                    }
-                                    alt={product.title}
-                                    className="w-24 h-24 object-contain bg-gray-100 rounded"
-                                />
-                                <div className="flex-1">
-                                    <h2 className="text-lg font-semibold">{product.title}</h2>
-                                    <p className="text-sm text-gray-500">
-                                        SKU: {product.sku}
-                                    </p>
-                                    <p className="text-sm text-gray-600 mb-1 line-clamp-3">{product.description}</p>
-                                    <p className="text-sm font-medium">
-                                        ₹{product.price} | <span
-                                            className={`px-2 py-1 rounded text-xs font-semibold ${product.stock_quantity <= 5
-                                                ? "bg-red-100 text-red-700"
-                                                : "bg-green-100 text-green-700"
-                                                }`}
-                                        >
-                                            Stock: {product.stock_quantity}
-                                        </span>
-                                    </p>
-                                    <div className="flex flex-wrap gap-2 mt-1">
-                                        {product.categories.map((cat) => (
-                                            <span
-                                                key={cat.id}
-                                                className="text-xs bg-gray-200 px-2 py-0.5 rounded"
+                <div className="container mx-auto max-w-5xl space-y-6 relative z-10">
+
+                    {/* Header Row Bar Block */}
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-white/[0.04] pb-6">
+                        <div>
+                            <h1 className="text-2xl font-black tracking-tight flex items-center gap-3">
+                                📦 Inventory Products
+                            </h1>
+                            <p className="text-xs text-slate-400 font-light mt-0.5">
+                                Current Batch Slots Loaded: <span className="text-emerald-400 font-mono font-bold">{products.length} units</span>
+                            </p>
+                        </div>
+                        <Link
+                            href="/user/product/create"
+                            className="sm:self-center bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-emerald-500/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-center"
+                        >
+                            + Add Product
+                        </Link>
+                    </div>
+
+                    {/* Core Conditional Rendering Engine */}
+                    {loading ? (
+                        <AdminProductPageLoader />
+                    ) : products.length === 0 ? (
+                        <div className="text-center py-20 text-slate-500 bg-[#111625]/20 rounded-3xl border border-white/[0.04] border-dashed max-w-xl mx-auto space-y-2">
+                            <p className="text-base font-bold text-slate-400">No Products Cataloged</p>
+                            <p className="text-xs font-light text-slate-500">Deploy fresh visual merchandise listings using the addition panels.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {products.map((product) => {
+                                const isLowStock = product.stock_quantity <= 5;
+                                const productImgUrl = product.image_url
+                                    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${formatImage(product.image_url)}`
+                                    : '/placeholder.png';
+
+                                return (
+                                    <div
+                                        key={product.id}
+                                        className="admin-product-row bg-[#111625] border border-white/[0.04] p-5 rounded-2xl flex flex-col sm:flex-row gap-5 hover:border-white/[0.1] hover:shadow-xl shadow-black/10 transition-all duration-300 opacity-0"
+                                    >
+                                        {/* Media Display Asset Block */}
+                                        <div className="w-24 h-24 relative bg-slate-950/40 rounded-xl p-2 border border-white/[0.02] flex items-center justify-center flex-shrink-0 self-center sm:self-start">
+                                            <Image
+                                                src={productImgUrl}
+                                                alt={product.title || "Product Thumbnail"}
+                                                fill
+                                                sizes="96px"
+                                                className="object-contain p-2 select-none"
+                                                unoptimized
+                                            />
+                                        </div>
+
+                                        {/* Metadata Content Descriptions Frame */}
+                                        <div className="flex-1 space-y-1.5 text-center sm:text-left">
+                                            <div className="space-y-0.5">
+                                                <h2 className="text-lg font-bold text-slate-200 tracking-tight line-clamp-1">{product.title}</h2>
+                                                <p className="text-xs font-mono text-slate-500 font-semibold">
+                                                    SKU Identifier: <span className="text-slate-400">{product.sku || "N/A"}</span>
+                                                </p>
+                                            </div>
+                                            <p className="text-xs text-slate-400 font-light line-clamp-2 max-w-2xl leading-relaxed">{product.description}</p>
+
+                                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-1 text-sm font-medium">
+                                                <span className="font-mono font-black text-slate-200">₹{Number(product.price).toLocaleString('en-IN')}</span>
+                                                <span className="text-slate-700 font-light">|</span>
+                                                <span
+                                                    className={`px-2.5 py-0.5 rounded-md text-[9px] uppercase tracking-widest font-black border select-none ${isLowStock
+                                                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20 animate-pulse"
+                                                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                                        }`}
+                                                >
+                                                    Stock: {product.stock_quantity} {isLowStock && "⚠️"}
+                                                </span>
+                                            </div>
+
+                                            {/* Category Pills Map row */}
+                                            <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 pt-1">
+                                                {product.categories?.map((cat) => (
+                                                    <span
+                                                        key={cat.id}
+                                                        className="text-[9px] uppercase tracking-wider font-bold bg-white/[0.02] border border-white/[0.04] text-slate-400 px-2 py-0.5 rounded-md"
+                                                    >
+                                                        {cat.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Modification Action Clusters Column */}
+                                        <div className="flex sm:flex-col items-center justify-center gap-2 border-t sm:border-t-0 border-white/[0.02] pt-4 sm:pt-0 shrink-0 w-full sm:w-auto">
+                                            <Link
+                                                href={`/user/product/edit/${product.slug}`}
+                                                className="w-full sm:w-20 px-3 py-2 text-center rounded-xl text-xs font-black uppercase tracking-wider bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white transition-all duration-200 cursor-pointer"
                                             >
-                                                {cat.name}
-                                            </span>
-                                        ))}
+                                                Edit
+                                            </Link>
+
+                                            <button
+                                                onClick={() => handleDelete(product.id)}
+                                                className="w-full sm:w-20 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white hover:border-transparent transition-all duration-200 cursor-pointer"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+
                                     </div>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <Link
-                                        href={`/user/product/edit/${product.slug}`}
-                                        className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded cursor-pointer"
-                                    >
-                                        Edit
-                                    </Link>
+                                );
+                            })}
+                        </div>
+                    )}
 
-                                    <button
-                                        onClick={() => handleDelete(product.id)}
-                                        className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded cursor-pointer"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                    {/* Premium Glassmorph Pagination Control Footers */}
+                    {products.length > 0 && (
+                        <div className="flex justify-between items-center pt-8 border-t border-white/[0.04] select-none text-xs">
+                            <button
+                                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                                disabled={page === 1 || loading}
+                                className="px-4 py-2 rounded-xl uppercase tracking-wider font-black bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-emerald-500 hover:text-slate-950 hover:border-transparent disabled:opacity-20 transition-all duration-300 cursor-pointer disabled:cursor-not-allowed">
+                                ⬅ Prev
+                            </button>
+                            <p className="text-gray-700">
+                                Page {page} of {totalPages}
+                            </p>
+                            <button onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))} disabled={page === totalPages || loading} className="px-4 py-2 rounded-xl uppercase tracking-wider font-black bg-white/[0.02] border border-white/[0.04] text-slate-300 hover:bg-emerald-500 hover:text-slate-950 hover:border-transparent disabled:opacity-20 transition-all duration-300 cursor-pointer disabled:cursor-not-allowed">
+                                Next ➡
+                            </button>
+                        </div>
 
-                {/* Pagination */}
-                {products.length > 0 && (
-                    <div className="flex justify-between items-center mt-6">
-                        <button
-                            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                            disabled={page === 1 || loading}
-                            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-                        >
-                            ⬅ Prev
-                        </button>
-                        <p className="text-gray-700">
-                            Page {page} of {totalPages}
-                        </p>
-                        <button
-                            onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                            disabled={page === totalPages || loading}
-                            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-                        >
-                            Next ➡
-                        </button>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
+
         </AdminOnly>
+
     )
 }

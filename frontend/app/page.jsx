@@ -1,14 +1,23 @@
 'use client';
-import Hero from "@/components/Hero";
-import ProductCard from "@/components/ProductCard";
-import axios from "axios";
+
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import axios from "axios";
+import gsap from "@/lib/gsap";
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from "@gsap/react";
+import PremiumHero from "@/components/PremiumHero";
+import FeaturedCategories from "@/components/FeaturedCategories";
+import ProductCard from "@/components/ProductCard";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const [clothings, setClothings] = useState([]);
   const [electronics, setElectronics] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const fetchProductByCategories = async () => {
@@ -17,8 +26,8 @@ export default function Home() {
           axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=clothings`),
           axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=electronics`),
         ]);
-        setClothings(clothingsResponse.data.items);
-        setElectronics(electronicsResponse.data.items);
+        setClothings(clothingsResponse.data?.items || []);
+        setElectronics(electronicsResponse.data?.items || []);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -28,59 +37,139 @@ export default function Home() {
     fetchProductByCategories();
   }, []);
 
-  if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
-  }
+  // GSAP ScrollTrigger Section Reveals
+  useGSAP(() => {
+    if (loading) return;
+
+    const sections = gsap.utils.toArray('.scroll-reveal-section');
+    
+    sections.forEach((section) => {
+      // Animate Section Headers smoothly
+      gsap.fromTo(section.querySelector('.section-header'),
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          scrollTrigger: {
+            trigger: section,
+            start: "top 85%",
+            toggleActions: "play none none none"
+          }
+        }
+      );
+
+      // Stagger individual card grid items as they pass the viewport
+      gsap.fromTo(section.querySelectorAll('.product-wrapper'),
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.08,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: section.querySelector('.products-grid'),
+            start: "top 85%",
+            toggleActions: "play none none none"
+          }
+        }
+      );
+    });
+  }, { scope: containerRef, dependencies: [loading] });
 
   return (
-    <div className="space-y-10">
-      <Hero />
-      <section className="text-2xl font-bold container mx-auto px-4"><div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Clothing Products</h2>
-        <Link href="/product" className="text-blue-600">View All</Link>
-      </div>
-      </section>
-      {
-        clothings.length === 0 ? (
-          <div className="text-center mt-10">No clothing products found.</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 container mx-auto px-4">
-            {
-              clothings.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-          </div>
-        )
-      }
-      <section className="text-2xl font-bold container mx-auto px-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">
-            Electronics Products
-          </h2>
+    <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white pb-24 space-y-24 overflow-hidden">
+      {/* Premium Hero Stage Component */}
+      <PremiumHero />
+      
+      {/* Featured Categories Carousel Grid */}
+      <FeaturedCategories />
 
-          <Link
-            href="/product"
-            className="text-blue-600"
-          >
-            View All
+      {/* Trending Fashion Section */}
+      <section className="scroll-reveal-section container mx-auto px-4 space-y-8">
+        <div className="section-header flex justify-between items-end border-b border-white/[0.04] pb-4">
+          <div>
+            <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
+              🔥 Trending Fashion
+            </h2>
+            <p className="text-slate-400 text-xs lg:text-sm mt-1">
+              Discover our most popular fashion picks.
+            </p>
+          </div>
+          <Link href="/product" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
+            View All →
           </Link>
         </div>
-      </section>
-      {
-        electronics.length === 0 ? (
-          <div className="text-center mt-10">No electronics products found.</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 container mx-auto px-4">
-            {
-              electronics.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))
-            }
+
+        {loading ? (
+          <ProductSkeletonGrid />
+        ) : clothings.length === 0 ? (
+          <div className="text-center py-16 text-slate-500 bg-[#111625]/40 rounded-2xl border border-white/[0.04] border-dashed">
+            No clothing products found.
           </div>
-        )
-      }
+        ) : (
+          <div className="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {clothings.map((product) => (
+              <div key={product.id || product._id} className="product-wrapper">
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
+      {/* Best Electronics Section */}
+      <section className="scroll-reveal-section container mx-auto px-4 space-y-8">
+        <div className="section-header flex justify-between items-end border-b border-white/[0.04] pb-4">
+          <div>
+            <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
+              ⚡ Best Electronics
+            </h2>
+            <p className="text-slate-400 text-xs lg:text-sm mt-1">
+              Top-rated gadgets and smart devices.
+            </p>
+          </div>
+          <Link href="/product" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
+            View All →
+          </Link>
+        </div>
 
+        {loading ? (
+          <ProductSkeletonGrid />
+        ) : electronics.length === 0 ? (
+          <div className="text-center py-16 text-slate-500 bg-[#111625]/40 rounded-2xl border border-white/[0.04] border-dashed">
+            No electronics products found.
+          </div>
+        ) : (
+          <div className="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {electronics.map((product) => (
+              <div key={product.id || product._id} className="product-wrapper">
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
+
+// Premium Shimmer Skeleton Grid Loader
+const ProductSkeletonGrid = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    {[...Array(4)].map((_, i) => (
+      <div key={i} className="bg-[#111625] p-5 rounded-2xl border border-white/[0.04] space-y-5 animate-pulse">
+        <div className="bg-slate-950/40 h-48 w-full rounded-xl" />
+        <div className="space-y-2">
+          <div className="h-3 bg-slate-800 rounded w-1/3" />
+          <div className="h-4 bg-slate-800 rounded w-5/6" />
+        </div>
+        <div className="flex justify-between items-center pt-2">
+          <div className="h-5 bg-slate-800 rounded w-1/4" />
+          <div className="h-8 bg-slate-800 rounded w-1/3" />
+        </div>
+      </div>
+    ))}
+  </div>
+);

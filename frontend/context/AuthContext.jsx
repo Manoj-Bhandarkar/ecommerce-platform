@@ -40,10 +40,8 @@ export const AuthProvider = ({ children }) => {
         }
       }
     } catch (err) {
-      console.error("Login failed:", err);
-      throw err;
-    } finally {
       setLoading(false);
+      throw err;
     }
   };
 

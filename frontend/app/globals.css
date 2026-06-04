@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/* 🛠️ GLOBAL DEVELOPER FIX: Purges white native HTML5 spinner blocks globally */
+@layer base {
+  input[type="number"] {
+    -moz-appearance: textfield; /* Firefox support token */
+  }
+  
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Webkit browser agent engine override */
+    margin: 0;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -11,4 +24,5 @@ html {
 body {
   margin: 0;
   padding: 0;
+  background-color: #0B0F19; /* Synchronizes default backmesh workspace color */
 }
