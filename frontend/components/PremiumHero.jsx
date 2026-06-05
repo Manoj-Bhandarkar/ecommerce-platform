@@ -1,13 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
 const PremiumHero = () => {
   const containerRef = useRef(null);
   const visualStageRef = useRef(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    setIsDesktop(window.innerWidth >= 1024);
+  }, []);
 
   useGSAP(() => {
     // 1. Fluid Orchestrated Text Entrance Timeline
@@ -44,6 +49,9 @@ const PremiumHero = () => {
 
   // 4. Combined Mouse Physics Engine (3D Tilt + Background Dynamic Spotlamp Glow)
   const handleMouseMove = (e) => {
+    if (typeof window === "undefined") return;
+    if (window.innerWidth < 1024) return;
+
     if (!containerRef.current) return;
     const { clientX, clientY } = e;
 
@@ -69,14 +77,16 @@ const PremiumHero = () => {
   };
 
   const handleMouseLeave = () => {
+    if (typeof window === "undefined") return;
+    if (window.innerWidth < 1024) return;
     gsap.to('.graphic-perspective-box', { rotationY: 0, rotationX: 0, duration: 0.8, ease: 'power3.out' });
   };
 
   return (
     <section
       ref={containerRef}
-      onMouseMove={window.innerWidth >= 1024 ? handleMouseMove : undefined}
-      onMouseLeave={window.innerWidth >= 1024 ? handleMouseLeave : undefined}
+      onMouseMove={isDesktop ? handleMouseMove : undefined}
+      onMouseLeave={isDesktop ? handleMouseLeave : undefined}
       className="relative min-h-screen flex items-center py-12 sm:py-16 lg:py-20 bg-[#0B0F19] text-white overflow-hidden transition-all duration-300 before:content-[''] before:absolute before:inset-0 before:opacity-[0.15] before:pointer-events-none before:bg-[radial-gradient(circle_800px_at_var(--mouse-x,0px)_var(--mouse-y,0px),#10B981_0%,transparent_100%)]"
     >
       {/* Decorative Matrix Background Lines */}

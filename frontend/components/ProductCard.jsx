@@ -17,12 +17,14 @@ const ProductCard = ({ product }) => {
   const discount = product.discount || 15;
 
   useGSAP(() => {
-    // 3D Magnetic Parallax Hover Logic
     const card = cardRef.current;
     if (!card) return;
 
+    if (window.innerWidth < 1024) return;
+
     const handleMouseMove = (e) => {
       const { left, top, width, height } = card.getBoundingClientRect();
+
       const x = (e.clientX - left) / width - 0.5;
       const y = (e.clientY - top) / height - 0.5;
 
@@ -30,8 +32,8 @@ const ProductCard = ({ product }) => {
         rotationY: x * 15,
         rotationX: -y * 15,
         transformPerspective: 1000,
-        ease: "power2.out",
         duration: 0.4,
+        ease: "power2.out",
       });
     };
 
@@ -39,25 +41,52 @@ const ProductCard = ({ product }) => {
       gsap.to(card, {
         rotationY: 0,
         rotationX: 0,
-        ease: "power3.out",
         duration: 0.6,
+        ease: "power3.out",
       });
     };
-    if (window.innerWidth >= 1024) {
-      card.addEventListener("mousemove", handleMouseMove);
-      card.addEventListener("mouseleave", handleMouseLeave);
-    }
+
+    card.addEventListener("mousemove", handleMouseMove);
+    card.addEventListener("mouseleave", handleMouseLeave);
+
     return () => {
-      if (window.innerWidth >= 1024) {
-        card.removeEventListener("mousemove", handleMouseMove);
-        card.removeEventListener("mouseleave", handleMouseLeave);
-      }
+      card.removeEventListener("mousemove", handleMouseMove);
+      card.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, []);
+  const handleMouseMove = (e) => {
+    if (window.innerWidth < 1024) return;
 
+    const card = cardRef.current;
+    if (!card) return;
+
+    const { left, top, width, height } = card.getBoundingClientRect();
+
+    const x = (e.clientX - left) / width - 0.5;
+    const y = (e.clientY - top) / height - 0.5;
+
+    gsap.to(card, {
+      rotationY: x * 15,
+      rotationX: -y * 15,
+      transformPerspective: 1000,
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    gsap.to(cardRef.current, {
+      rotationY: 0,
+      rotationX: 0,
+      duration: 0.6,
+      ease: "power3.out",
+    });
+  };
   return (
     <div
       ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className="group bg-[#111625] rounded-2xl overflow-hidden border border-white/[0.04] shadow-lg hover:shadow-emerald-500/5 hover:border-white/[0.1] transition-all duration-300 h-full flex flex-col [transform-style:preserve-3d]"
     >
       {/* Image Gallery wrapper */}

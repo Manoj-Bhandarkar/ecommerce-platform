@@ -32,6 +32,9 @@ export default function Home() {
         console.error("Error fetching products:", error);
       } finally {
         setLoading(false);
+         setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 300);
       }
     };
     fetchProductByCategories();
@@ -79,10 +82,11 @@ export default function Home() {
   }, { scope: containerRef, dependencies: [loading] });
 
   return (
-    <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white pb-24 space-y-24 overflow-hidden">
+    <BottleShowcase>
+    <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white pb-24 space-y-24">
       {/* Premium Hero Stage Component */}
       <PremiumHero />
-          <BottleShowcase /> 
+        
       {/* Featured Categories Carousel Grid */}
       <FeaturedCategories />
 
@@ -152,6 +156,7 @@ export default function Home() {
         )}
       </section>
     </div>
+    </BottleShowcase>
   );
 }
 

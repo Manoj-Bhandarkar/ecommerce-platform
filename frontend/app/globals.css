@@ -3,12 +3,14 @@
 /* 🛠️ GLOBAL DEVELOPER FIX: Purges white native HTML5 spinner blocks globally */
 @layer base {
   input[type="number"] {
-    -moz-appearance: textfield; /* Firefox support token */
+    -moz-appearance: textfield;
+    /* Firefox support token */
   }
-  
+
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none; /* Webkit browser agent engine override */
+    -webkit-appearance: none;
+    /* Webkit browser agent engine override */
     margin: 0;
   }
 }
@@ -18,11 +20,23 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto !important;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0B0F19; /* Synchronizes default backmesh workspace color */
+  background-color: #0B0F19;
+  /* Synchronizes default backmesh workspace color */
+}
+
+.bottle-wrapper {
+  transform-style: preserve-3d !important;
+  backface-visibility: hidden !important;
+  will-change: transform, opacity !important;
+}
+
+.fixed {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
