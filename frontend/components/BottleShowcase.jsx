@@ -27,24 +27,24 @@ export default function BottleShowcase({ children }) {
 
 
         gsap.set(bottleRef.current, {
-            x: mobile ? 120 : 550,
-            y: 0,
+            x: mobile ? 170 : 700,
+            y: 150,
             rotation: 15,
         });
 
         tl
             .to(bottleRef.current, {
-                x: mobile ? -120 : -550,
+                x: mobile ? -170 : -600,
                 rotation: -20,
                 duration: 1,
             })
             .to(bottleRef.current, {
-                x: mobile ? 120 : 550,
+                x: mobile ? 170 : 600,
                 rotation: 20,
                 duration: 1,
             })
             .to(bottleRef.current, {
-                x: mobile ? -120 : -550,
+                x: mobile ? -170 : -600,
                 rotation: -15,
                 duration: 1,
             });
