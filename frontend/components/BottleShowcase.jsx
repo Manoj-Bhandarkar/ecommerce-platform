@@ -19,7 +19,7 @@ export default function BottleShowcase({ children }) {
             scrollTrigger: {
                 trigger: containerRef.current,
                 start: "top top",
-                end: "+=3500", 
+                end: "+=3500",
                 scrub: 1,
                 invalidateOnRefresh: true,
             },
@@ -51,16 +51,16 @@ export default function BottleShowcase({ children }) {
 
 
         ScrollTrigger.create({
-            trigger: "#footer-bottle-box",
-            start: "top bottom",
-            end: "bottom bottom",
+            trigger: containerRef.current,
+            start: "bottom-=800 bottom",
+            end: "bottom",
             scrub: true,
             onUpdate: (self) => {
-                const targetBox = document.getElementById('footer-bottle-box');
+                const targetBox = typeof document !== 'undefined' ? document.getElementById('footer-bottle-box') : null;
                 const bottle = bottleRef.current;
 
                 if (targetBox && bottle) {
-                    if (self.progress > 0.8) {
+                    if (self.progress > 0.7) {
                         if (bottle.parentElement !== targetBox) {
                             targetBox.appendChild(bottle);
 
@@ -89,7 +89,7 @@ export default function BottleShowcase({ children }) {
                                 left: "auto",
                                 xPercent: 0,
                                 yPercent: 0,
-                                x: tl.getProperty(bottle, "x"), // मुख्य टाइमलाइनची चालू डावी-उजवी पोझिशन मिळवणे
+                                x: tl.getProperty(bottle, "x"),
                                 rotation: tl.getProperty(bottle, "rotation"),
                                 scale: 1
                             });
