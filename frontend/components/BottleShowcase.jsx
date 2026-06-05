@@ -15,18 +15,17 @@ export default function BottleShowcase({ children }) {
     useGSAP(() => {
         const mobile = window.innerWidth < 640;
 
-        // मुख्य टाइमलाइन - जी बॉटलला फक्त डावीकडे-उजवीकडे हलवेल
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: containerRef.current,
                 start: "top top",
-                end: "+=3500", // फुटर येण्याच्या आधीच हे ॲनिमेशन संपेल
+                end: "+=3500", 
                 scrub: 1,
                 invalidateOnRefresh: true,
             },
         });
 
-        // सुरुवातीला y: 0 ठेवणे
+
         gsap.set(bottleRef.current, {
             x: mobile ? 120 : 550,
             y: 0,
@@ -34,8 +33,6 @@ export default function BottleShowcase({ children }) {
         });
 
         tl
-            // 🛠️ मास्टर बदल: इथून आपण 'y' पूर्णपणे काढला आहे! 
-            // बॉटल फक्त डावीकडे आणि उजवीकडे जाईल, एका जागी स्थिर राहून स्क्रोल होईल.
             .to(bottleRef.current, {
                 x: mobile ? -120 : -550,
                 rotation: -20,
@@ -52,51 +49,49 @@ export default function BottleShowcase({ children }) {
                 duration: 1,
             });
 
-        // 🛠️ रिपेरेंटिंग ट्रिगर: जेव्हा फुटर येईल तेव्हाच बॉटल जागेवरून हलून बॉक्समध्ये जाईल
+
         ScrollTrigger.create({
             trigger: "#footer-bottle-box",
-            start: "top bottom", 
-            end: "bottom bottom", 
+            start: "top bottom",
+            end: "bottom bottom",
             scrub: true,
             onUpdate: (self) => {
                 const targetBox = document.getElementById('footer-bottle-box');
                 const bottle = bottleRef.current;
 
                 if (targetBox && bottle) {
-                    // प्रोग्रेस ८०% च्या पुढे गेल्यावर (फुटर स्क्रीनवर सेट होताना)
                     if (self.progress > 0.8) {
                         if (bottle.parentElement !== targetBox) {
                             targetBox.appendChild(bottle);
-                            
-                            // फुटर बॉक्सच्या अगदी मधोमध बसवण्यासाठी पोझिशन रिसेट
-                            gsap.set(bottle, { 
-                                position: "absolute", 
-                                top: "50%", 
-                                left: "50%", 
-                                xPercent: -50, 
-                                yPercent: -50, 
-                                x: 0, 
-                                y: 0, 
-                                rotation: 0, 
-                                scale: mobile ? 1.4 : 1.8 
+
+                            gsap.set(bottle, {
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                xPercent: -50,
+                                yPercent: -50,
+                                x: 0,
+                                y: 0,
+                                rotation: 0,
+                                scale: mobile ? 1.4 : 1.8
                             });
                         }
                     } else {
-                        // युझरने वर स्क्रोल करताच बॉटल पुन्हा मूळ फिक्स्ड स्क्रीनवर येईल
+
                         const fixedContainer = document.getElementById('fixed-bottle-stage');
                         if (fixedContainer && bottle.parentElement !== fixedContainer) {
                             fixedContainer.appendChild(bottle);
-                            
-                            // फिक्स्ड स्क्रीनवर येताच आधीचे को-ऑर्डिनेट्स पूर्ववत करणे
-                            gsap.set(bottle, { 
-                                position: "relative", 
-                                top: "auto", 
-                                left: "auto", 
-                                xPercent: 0, 
-                                yPercent: 0, 
+
+
+                            gsap.set(bottle, {
+                                position: "relative",
+                                top: "auto",
+                                left: "auto",
+                                xPercent: 0,
+                                yPercent: 0,
                                 x: tl.getProperty(bottle, "x"), // मुख्य टाइमलाइनची चालू डावी-उजवी पोझिशन मिळवणे
                                 rotation: tl.getProperty(bottle, "rotation"),
-                                scale: 1 
+                                scale: 1
                             });
                         }
                     }
@@ -104,7 +99,7 @@ export default function BottleShowcase({ children }) {
             }
         });
 
-        // स्वतंत्र फ्लोटिंग इफेक्ट
+
         gsap.to('.bottle-wrapper', {
             y: -12,
             duration: 2,
