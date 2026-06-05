@@ -6,7 +6,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
-// CRITICAL FIX: Always register the plugin on the client side file safely
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -38,11 +37,10 @@ const categories = [
   },
 ];
 
-const FeaturedCategories = () => {
+export default function FeaturedCategories() {
   const sectionRef = useRef(null);
 
   useGSAP(() => {
-    // Elegant fade-up animation for the header section
     gsap.from('.category-header', {
       opacity: 0,
       y: 30,
@@ -50,11 +48,9 @@ const FeaturedCategories = () => {
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top 90%',
-        toggleActions: 'play none none none',
       },
     });
 
-    // Target the card class correctly with safe viewport fallbacks
     gsap.from('.category-card-animator', {
       opacity: 0,
       y: 40,
@@ -64,7 +60,6 @@ const FeaturedCategories = () => {
       scrollTrigger: {
         trigger: '.categories-grid',
         start: 'top 90%',
-        toggleActions: 'play none none none',
       },
     });
   }, { scope: sectionRef });
@@ -72,61 +67,54 @@ const FeaturedCategories = () => {
   return (
     <section
       ref={sectionRef}
-      className="container mx-auto px-4 py-16 min-h-[400px] clear-both overflow-hidden"
+      className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 overflow-hidden"
     >
-      {/* Header Container Wrapper */}
-      <div className="category-header text-center mb-12">
-        <span className="text-emerald-400 font-bold text-xs uppercase tracking-widest bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20 select-none">
+      {/* Header */}
+      <div className="category-header text-center mb-10 lg:mb-14">
+
+        <span className="inline-flex text-emerald-400 font-bold text-xs uppercase tracking-widest bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20 select-none">
           Categories
         </span>
 
-        <h2 className="text-3xl lg:text-4xl font-black text-white mt-4 tracking-tight">
+        <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black text-white mt-5 tracking-tight">
           Shop By Category
         </h2>
 
-        <p className="text-slate-400 mt-3 text-sm lg:text-base max-w-xl mx-auto leading-relaxed">
-          Explore our carefully selected collections designed to match your lifestyle and needs.
+        <p className="text-slate-400 mt-4 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+          Explore our carefully selected collections designed to match
+          your lifestyle and needs.
         </p>
+
       </div>
 
-      {/* Grid Container */}
-      <div className="categories-grid grid grid-cols-2 lg:grid-cols-4 gap-6 w-full min-h-[200px]">
+      {/* Categories Grid */}
+      <div
+        className="categories-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+      >
         {categories.map((category) => (
           <Link
             key={category.name}
             href={`/product?category=${category.slug}`}
-            className="category-card-animator block group"
+            className="category-card-animator group"
           >
             <div
-              className="
-                bg-[#111625]
-                rounded-2xl
-                p-6
-                lg:p-8
-                text-center
-                shadow-lg
-                border
-                border-white/[0.04]
-                group-hover:border-white/[0.1]
-                group-hover:shadow-emerald-500/5
-                group-hover:-translate-y-2
-                transition-all
-                duration-300
-                h-full
-              "
+              className="bg-[#111625] rounded-2xl p-5 sm:p-6 lg:p-8 border border-white/[0.04] shadow-lg h-full min-h-[220px] flex flex-col items-center justify-center text-center transition-all duration-300 hover:-translate-y-2 hover:border-emerald-500/20 hover:shadow-emerald-500/10"
             >
-              {/* Animated Floating Emoji Frame */}
-              <div className="text-4xl lg:text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300 select-none filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.2)]">
+              <div
+                className="text-5xl lg:text-6xl mb-5 select-none transition-transform duration-300 group-hover:scale-110"
+              >
                 {category.icon}
               </div>
 
-              {/* Title */}
-              <h3 className="font-black text-slate-200 text-lg lg:text-xl tracking-tight group-hover:text-emerald-400 transition-colors duration-200">
+              <h3
+                className="text-lg sm:text-xl font-black text-slate-200 tracking-tight transition-colors duration-300 group-hover:text-emerald-400"
+              >
                 {category.name}
               </h3>
 
-              {/* Description */}
-              <p className="text-slate-400 mt-2 text-xs lg:text-sm leading-relaxed">
+              <p
+                className="mt-3 text-sm text-slate-400 leading-relaxed"
+              >
                 {category.description}
               </p>
             </div>
@@ -135,6 +123,4 @@ const FeaturedCategories = () => {
       </div>
     </section>
   );
-};
-
-export default FeaturedCategories;
+}

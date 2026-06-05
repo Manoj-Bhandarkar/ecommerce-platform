@@ -13,10 +13,12 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   // This function can now run safely without throwing ReferenceErrors
-  const fetchUser = useCallback(async () => {
+  const fetchUser = useCallback(async (signal) => {
     try {
       const res = await api.get("/api/v1/account/me");
-      setUser(res.data);
+      if (!signal?.aborted) {
+        setUser(res.data);
+      }
       return res.data;
     } catch (error) {
       setUser(null);
@@ -52,6 +54,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout API failed:", err);
     } finally {
       setUser(null);
+      setLoading(false);
       router.push("/login");
     }
   };
@@ -75,7 +78,8 @@ export const AuthProvider = ({ children }) => {
     const publicRoutes = [
       "/",
       "/login",
-      "/register"
+      "/register",
+      "/product"
     ];
 
     if (
@@ -85,7 +89,9 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       return;
     }
-    fetchUser();
+    fetchUser(controller.signal);
+
+    return () => controller.abort();
   }, [fetchUser]);
 
   return (
