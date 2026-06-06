@@ -5,6 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.product import Product
 from src.schemas.cart_item import CartItemCreate, CartItemOut, CartSummary
 from src.repositories.cart_item import CartRepository
+import json
+from fastapi.encoders import jsonable_encoder
+from src.core.redis import redis_client
 
 
 async def add_to_cart(
@@ -43,7 +46,7 @@ async def add_to_cart(
             quantity=data.quantity,
             price=product.price,
         )
-
+    await redis_client.delete(f"cart:{user_id}")
     return CartItemOut(
         id=item.id,
         user_id=item.user_id,
@@ -61,6 +64,11 @@ async def list_user_cart(
     session: AsyncSession,
     user_id: UUID,
 ) -> CartSummary:
+    cache_key = f"cart:{user_id}"
+    cached_data = await redis_client.get(cache_key)
+    if cached_data:
+        return json.loads(cached_data)
+
     cart_items = await CartRepository.get_user_cart_items(
         session=session,
         user_id=user_id,
@@ -92,11 +100,14 @@ async def list_user_cart(
             )
         )
 
-    return CartSummary(
+    response = CartSummary(
         items=cart_data,
         total_quantity=total_quantity,
         total_price=total_price,
     )
+    
+    await redis_client.setex(cache_key, 1800, json.dumps(jsonable_encoder(response)))
+    return response
 
 
 async def change_cart_item_quantity_by_product(
@@ -153,6 +164,7 @@ async def change_cart_item_quantity_by_product(
             session=session,
             item=item,
         )
+        await redis_client.delete(f"cart:{user_id}")
         return {"message": "Item removed from cart"}
     if new_quantity > product.stock_quantity:
         raise HTTPException(
@@ -162,6 +174,7 @@ async def change_cart_item_quantity_by_product(
     item.quantity = new_quantity
     item.price = product.price
     await CartRepository.save(session, item)
+    await redis_client.delete(f"cart:{user_id}")
 
     return CartItemOut(
         id=item.id,
@@ -193,3 +206,4 @@ async def delete_cart_item(
         )
     await CartRepository.delete_cart_item(session=session, item=item)
     await CartRepository.commit(session)
+    await redis_client.delete(f"cart:{user_id}")

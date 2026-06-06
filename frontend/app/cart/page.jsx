@@ -90,10 +90,7 @@ const CartPage = () => {
           {/* LEFT CONTAINER: Multi-Item Cards Stack */}
           <div className="lg:col-span-8 space-y-4">
             {cart.items.map((item) => {
-              const itemImageUrl = item.product_image?.startsWith("http")
-                ? item.product_image
-                : `${process.env.NEXT_PUBLIC_API_BASE_URL}/${item.product_image}`;
-
+             
               const isItemBusy = updatingItemId === item.id;
 
               return (
@@ -106,7 +103,11 @@ const CartPage = () => {
                   <div className="w-full sm:w-28 flex-shrink-0 flex flex-col items-center">
                     <div className="w-24 h-24 sm:w-24 sm:h-24 relative bg-slate-950/40 rounded-xl p-2 border border-white/[0.02] flex items-center justify-center">
                       <Image
-                        src={itemImageUrl}
+                        src={
+                          item.image_url
+                            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${item.product_image}`
+                            : "/placeholder.png"
+                        }
                         alt={item.product_title || "Product Image"}
                         fill
                         sizes="96px"
