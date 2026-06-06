@@ -62,20 +62,20 @@ const ProductDetailPage = () => {
     );
   }
 
-  const imageUrl = product.image_url?.startsWith("http")
-    ? product.image_url
-    : `${process.env.NEXT_PUBLIC_API_BASE_URL}/${product.image_url}`;
-
   return (
     <div className="bg-[#0B0F19] min-h-screen text-white pb-32 relative">
       <div className="container mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-        
+
         {/* LEFT SIDE: Product Gallery & Description Sheet */}
         <div className="space-y-12 w-full">
           {/* Product Image Display Frame */}
           <div className="relative w-full h-[380px] sm:h-[460px] md:h-[500px] bg-slate-950/40 rounded-3xl border border-white/[0.04] p-8 flex items-center justify-center shadow-2xl">
             <Image
-              src={imageUrl}
+              src={
+                product.image_url
+                  ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${product.image_url}`
+                  : "/placeholder.png"
+              }
               alt={product.title || "Product Showcase Image"}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -99,7 +99,7 @@ const ProductDetailPage = () => {
         {/* RIGHT SIDE: Standard Buy Box Dashboard Panel */}
         <div className="w-full">
           <div className="w-full bg-[#111625] rounded-3xl border border-white/[0.04] p-8 lg:p-10 shadow-2xl space-y-6">
-            
+
             {/* Category Badging */}
             <div className="flex flex-wrap gap-2">
               {product.categories?.map((cat) => (
@@ -110,10 +110,10 @@ const ProductDetailPage = () => {
                   {cat.name}
                 </span>
               )) || (
-                <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-[10px] uppercase font-black tracking-widest select-none">
-                  Premium Category
-                </span>
-              )}
+                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-[10px] uppercase font-black tracking-widest select-none">
+                    Premium Category
+                  </span>
+                )}
             </div>
 
             {/* Title */}

@@ -8,6 +8,9 @@ from src.schemas.product import ProductCreate, ProductUpdate
 from src.utils.file import save_upload_file
 from src.utils.slug import generate_slug
 from typing import TYPE_CHECKING
+import json
+from src.core.redis import redis_client
+from fastapi.encoders import jsonable_encoder
 
 if TYPE_CHECKING:
     from src.models.product import Product
@@ -67,13 +70,25 @@ async def get_all_products(
 
 
 async def get_product_by_slug(session: AsyncSession, slug: str):
+    cache_key = f"product:{slug}"
+
+    cached_data = await redis_client.get(cache_key)
+
+    if cached_data:
+        print("CACHE HIT:", cache_key)
+        return json.loads(cached_data)
+
+    print("CACHE MISS:", cache_key)
+
     product = await ProductRepository.get_by_slug(session=session, slug=slug)
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found",
         )
-    return product
+    response = jsonable_encoder(product)
+    await redis_client.setex(cache_key, 3600, json.dumps(response))
+    return response
 
 
 async def search_products(
@@ -86,6 +101,7 @@ async def search_products(
     limit: int,
     page: int,
 ):
+    cache_key = f"products:" f"{category_names}:" f"{title}:" f"{page}:" f"{limit}"
 
     if min_price is not None and max_price is not None and min_price > max_price:
         raise HTTPException(
@@ -94,6 +110,14 @@ async def search_products(
         )
 
     offset = (page - 1) * limit
+
+    cached_data = await redis_client.get(cache_key)
+
+    if cached_data:
+        print("CACHE HIT:", cache_key)
+        return json.loads(cached_data)
+
+    print("CACHE MISS:", cache_key)
 
     total, products = await ProductRepository.search(
         session=session,
@@ -106,12 +130,16 @@ async def search_products(
         offset=offset,
     )
 
-    return {
+    response = {
         "total": total,
         "page": page,
         "limit": limit,
         "items": products,
     }
+
+    await redis_client.setex(cache_key, 3600, json.dumps(jsonable_encoder(response)))
+
+    return response
 
 
 async def update_product_by_id(
@@ -177,12 +205,29 @@ async def update_product_by_id(
         image_path = await save_upload_file(image, "products")
         product.image_url = image_path
 
-    return await ProductRepository.save(session=session, product=product)
+    updated_product = await ProductRepository.save(session=session, product=product)
+
+    # Product detail cache delete
+    await redis_client.delete(f"product:{updated_product.slug}")
+
+    # Product listing cache delete
+    for key in await redis_client.keys("products:*"):
+        await redis_client.delete(key)
+
+    return updated_product
 
 
 async def delete_product(session: AsyncSession, product_id: int) -> bool:
     product = await ProductRepository.get_by_id(session=session, product_id=product_id)
     if not product:
         return False
+    slug = product.slug
     await ProductRepository.delete(session=session, product=product)
+    # Delete product detail cache
+    await redis_client.delete(f"product:{slug}")
+
+    # Delete all product list caches
+    for key in await redis_client.keys("products:*"):
+        await redis_client.delete(key)
+
     return True
