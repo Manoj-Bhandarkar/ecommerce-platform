@@ -78,7 +78,7 @@ const CheckoutPage = () => {
             });
 
             const data = res.data;
-
+           
             if (selectedGateway === "razorpay") {
                 if (typeof window === 'undefined' || !window.Razorpay) {
                     setError("Razorpay secure terminal failed to init. Refresh the dashboard.");
@@ -247,10 +247,17 @@ const CheckoutPage = () => {
                                             onChange={() => setSelectedGateway('mock')}
                                             className="peer sr-only"
                                         />
-                                        <div className="w-5 h-5 rounded-full border-2 border-slate-500 flex items-center justify-center peer-data-[state=checked]:border-emerald-400 transition-colors">
-                                            <div className="w-3 h-3 rounded-full bg-emerald-400 opacity-0 peer-data-[state=checked]:opacity-100 transition-opacity"></div>
+                                        <div className="w-5 h-5 rounded-full border-2 border-slate-500 flex items-center justify-center peer-checked:border-emerald-400 transition-colors">
+                                            <div className="w-3 h-3 rounded-full bg-emerald-400 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
                                         </div>
-                                        <span className="text-sm font-medium text-slate-300">Mock Gateway (Test Mode)</span>
+                                        <span
+                                            className={`text-sm font-medium ${selectedGateway === 'mock'
+                                                ? 'text-emerald-400'
+                                                : 'text-slate-300'
+                                                }`}
+                                        >
+                                            Mock Gateway (Test Mode)
+                                        </span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
@@ -260,10 +267,17 @@ const CheckoutPage = () => {
                                             onChange={() => setSelectedGateway('razorpay')}
                                             className="peer sr-only"
                                         />
-                                        <div className="w-5 h-5 rounded-full border-2 border-slate-500 flex items-center justify-center peer-data-[state=checked]:border-emerald-400 transition-colors">
-                                            <div className="w-3 h-3 rounded-full bg-emerald-400 opacity-0 peer-data-[state=checked]:opacity-100 transition-opacity"></div>
+                                        <div className="w-5 h-5 rounded-full border-2 border-slate-500 flex items-center justify-center peer-checked:border-emerald-400">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 opacity-0 peer-checked:opacity-100"></div>
                                         </div>
-                                        <span className="text-sm font-medium text-slate-300">Razorpay (Live Mode)</span>
+                                        <span
+                                            className={`text-sm font-medium ${selectedGateway === 'razorpay'
+                                                ? 'text-emerald-400'
+                                                : 'text-slate-300'
+                                                }`}
+                                        >
+                                            Razorpay (Live Mode)
+                                        </span>
                                     </label>
                                 </div>
                                 <p className="text-xs text-slate-500 font-light">Select your preferred payment gateway for secure transaction processing.</p>
@@ -278,12 +292,12 @@ const CheckoutPage = () => {
                             <div className="space-y-4">
                                 {cart.items.map(item => (
                                     <div key={item.id} className="flex gap-3 sm:gap-4 items-start">
-                                        <img src={item.product_image} alt={item.product_name} className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0" />
+                                        <img src={item.product_image} alt={item.product_title} className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0" />
                                         <div className="flex-1">
-                                            <h3 className="text-xs sm:text-sm font-medium break-words">{item.product_name}</h3>
+                                            <h3 className="text-xs sm:text-sm font-medium break-words">{item.product_title}</h3>
                                             <p className="text-xs text-slate-500">Qty: {item.quantity}</p>
                                         </div>
-                                        <span className="text-xs sm:text-sm font-bold text-emerald-400 whitespace-nowrap">₹{(item.unit_price * item.quantity).toLocaleString('en-IN')}   </span>
+                                        <span className="text-xs sm:text-sm font-bold text-emerald-400 whitespace-nowrap">₹{(item.total * item.quantity).toLocaleString('en-IN')}   </span>
                                     </div>
                                 ))}
                             </div>

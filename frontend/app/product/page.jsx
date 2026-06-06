@@ -42,7 +42,7 @@ const ProductPage = () => {
           params.append("title", debouncedSearch);
         }
         if (category) {
-          params.append("categories", category);
+          params.append("category", category);
         }
         console.log("Category:", category);
         console.log("Request:", params.toString());
