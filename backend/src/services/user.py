@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.services.email import send_welcome_verification_email
+from src.tasks.email_tasks import send_welcome_email_task
 from src.schemas.user import UserCreate
 from src.core.security import hash_password
 from src.repositories.user import UserRepository
@@ -21,7 +21,12 @@ async def create_user(session: AsyncSession, user: UserCreate):
             "hashed_password": hash_password(user.password),
         },
     )
+    print("BEFORE CELERY")
     # SEND WELCOME EMAIL
-    await send_welcome_verification_email(new_user)
-
+    result = send_welcome_email_task.delay(
+        str(new_user.id),
+        new_user.email,
+    )
+    print(result.id)
+    print("AFTER CELERY")
     return new_user
