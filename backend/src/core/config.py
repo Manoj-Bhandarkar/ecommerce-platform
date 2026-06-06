@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_SECRET: str
     RAZORPAY_CALLBACK_URL: str
 
+    REDIS_HOST: str = "localhost"
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

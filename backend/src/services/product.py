@@ -1,16 +1,17 @@
 from fastapi import HTTPException, status, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from src.models.product import Product
 from src.repositories.product import ProductRepository
 from src.repositories.category import CategoryRepository
 from src.schemas.product import ProductCreate, ProductUpdate
 
 from src.utils.file import save_upload_file
 from src.utils.slug import generate_slug
-from typing import TYPE_CHECKING
 import json
 from src.core.redis import redis_client
 from fastapi.encoders import jsonable_encoder
+
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.models.product import Product
