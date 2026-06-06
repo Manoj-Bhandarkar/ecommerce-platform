@@ -25,10 +25,10 @@ export default function Home() {
     const fetchProductByCategories = async () => {
       try {
         const [clothingsRes, electronicsRes, footwearRes, accessoriesRes] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=clothings`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=electronics`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=footwear`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=accessories`)
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=clothings&limit=4`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=electronics&limit=4`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=footwear&limit=4`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=accessories&limit=4`)
         ]);
         setClothings(clothingsRes.data?.items || []);
         setElectronics(electronicsRes.data?.items || []);
@@ -107,7 +107,7 @@ export default function Home() {
                 Discover our most popular fashion picks.
               </p>
             </div>
-            <Link href="/product" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
+            <Link href="product?category=clothings" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
               View All →
             </Link>
           </div>
@@ -140,7 +140,7 @@ export default function Home() {
                 Top-rated gadgets and smart devices.
               </p>
             </div>
-            <Link href="/product" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
+            <Link href="product?category=electronics" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
               View All →
             </Link>
           </div>
@@ -173,7 +173,7 @@ export default function Home() {
             </div>
 
             <Link
-              href="/product"
+              href="product?category=footwear"
               className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300"
             >
               View All →
@@ -208,7 +208,7 @@ export default function Home() {
             </div>
 
             <Link
-              href="/product"
+              href="product?category=accessories"
               className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300"
             >
               View All →

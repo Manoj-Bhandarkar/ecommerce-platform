@@ -27,13 +27,13 @@ const categories = [
     name: 'Footwear',
     icon: '👟',
     description: 'Comfort meets style',
-    slug: 'clothings',
+    slug: 'footwear',
   },
   {
     name: 'Accessories',
     icon: '⌚',
     description: 'Complete your look',
-    slug: 'clothings',
+    slug: 'accessories',
   },
 ];
 

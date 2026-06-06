@@ -5,6 +5,7 @@ import axios from "axios";
 import ProductCard from "@/components/ProductCard";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useSearchParams } from "next/navigation";
 
 const ProductPage = () => {
   const [products, setProducts] = useState([]);
@@ -13,7 +14,8 @@ const ProductPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category");
   const pageContainerRef = useRef(null);
   const limit = 20; // 20 is perfectly divisible by 1, 2, and 4 columns for balanced rows
 
@@ -39,7 +41,11 @@ const ProductPage = () => {
         if (debouncedSearch.trim() !== "") {
           params.append("title", debouncedSearch);
         }
-
+        if (category) {
+          params.append("categories", category);
+        }
+        console.log("Category:", category);
+        console.log("Request:", params.toString());
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?${params.toString()}`
         );
@@ -54,7 +60,7 @@ const ProductPage = () => {
     };
 
     fetchProducts();
-  }, [page, debouncedSearch]);
+  }, [page, debouncedSearch, category]);
 
   // Smooth Stagger Reveal Animations for fresh product drops
   useGSAP(() => {
@@ -81,7 +87,9 @@ const ProductPage = () => {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 border-b border-white/[0.04] pb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-3">
-            🛍️ All Products
+            {category
+              ? `🛍️ ${category.charAt(0).toUpperCase() + category.slice(1)}`
+              : "🛍️ All Products"}
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-400 mt-1 font-light">
