@@ -9,8 +9,8 @@ export default function Footer() {
         shop: [
             { label: "Trending Fashion", href: "/product?category=clothings" },
             { label: "Best Electronics", href: "/product?category=electronics" },
-            { label: "New Arrivals", href: "/product" },
-            { label: "Exclusive Drops", href: "/product" },
+            { label: "Trending Footwear", href: "/product?category=footwear" },
+            { label: "Exclusive Accessories", href: "/product?category=accessories" },
         ],
         support: [
             { label: "Track Order", href: "/user/order" },

@@ -75,6 +75,7 @@ export const AuthProvider = ({ children }) => {
 
 
   useEffect(() => {
+    const controller = new AbortController();
     const publicRoutes = [
       "/",
       "/login",

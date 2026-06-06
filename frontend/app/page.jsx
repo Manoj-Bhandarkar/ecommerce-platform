@@ -15,24 +15,30 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Home() {
   const [clothings, setClothings] = useState([]);
   const [electronics, setElectronics] = useState([]);
+  const [footwear, setFootwear] = useState([]);
+  const [accessories, setAccessories] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const containerRef = useRef(null);
 
   useEffect(() => {
     const fetchProductByCategories = async () => {
       try {
-        const [clothingsResponse, electronicsResponse] = await Promise.all([
+        const [clothingsRes, electronicsRes, footwearRes, accessoriesRes] = await Promise.all([
           axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=clothings`),
           axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=electronics`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=footwear`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=accessories`)
         ]);
-        setClothings(clothingsResponse.data?.items || []);
-        setElectronics(electronicsResponse.data?.items || []);
+        setClothings(clothingsRes.data?.items || []);
+        setElectronics(electronicsRes.data?.items || []);
+        setFootwear(footwearRes.data?.items || []);
+        setAccessories(accessoriesRes.data?.items || []);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
         setLoading(false);
-         setTimeout(() => {
+        setTimeout(() => {
           ScrollTrigger.refresh();
         }, 300);
       }
@@ -45,7 +51,7 @@ export default function Home() {
     if (loading) return;
 
     const sections = gsap.utils.toArray('.scroll-reveal-section');
-    
+
     sections.forEach((section) => {
       // Animate Section Headers smoothly
       gsap.fromTo(section.querySelector('.section-header'),
@@ -83,79 +89,149 @@ export default function Home() {
 
   return (
     <BottleShowcase>
-    <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white pb-24 space-y-24">
-      {/* Premium Hero Stage Component */}
-      <PremiumHero />
-        
-      {/* Featured Categories Carousel Grid */}
-      <FeaturedCategories />
+      <div ref={containerRef} className="bg-[#0B0F19] min-h-screen text-white pb-24 space-y-24">
+        {/* Premium Hero Stage Component */}
+        <PremiumHero />
 
-      {/* Trending Fashion Section */}
-      <section className="scroll-reveal-section container mx-auto px-4 space-y-8">
-        <div className="section-header flex justify-between items-end border-b border-white/[0.04] pb-4">
-          <div>
-            <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
-              🔥 Trending Fashion
-            </h2>
-            <p className="text-slate-400 text-xs lg:text-sm mt-1">
-              Discover our most popular fashion picks.
-            </p>
-          </div>
-          <Link href="/product" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
-            View All →
-          </Link>
-        </div>
+        {/* Featured Categories Carousel Grid */}
+        <FeaturedCategories />
 
-        {loading ? (
-          <ProductSkeletonGrid />
-        ) : clothings.length === 0 ? (
-          <div className="text-center py-16 text-slate-500 bg-[#111625]/40 rounded-2xl border border-white/[0.04] border-dashed">
-            No clothing products found.
+        {/* Trending Fashion Section */}
+        <section className="scroll-reveal-section container mx-auto px-4 space-y-8">
+          <div className="section-header flex justify-between items-end border-b border-white/[0.04] pb-4">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
+                🔥 Trending Fashion
+              </h2>
+              <p className="text-slate-400 text-xs lg:text-sm mt-1">
+                Discover our most popular fashion picks.
+              </p>
+            </div>
+            <Link href="/product" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
+              View All →
+            </Link>
           </div>
-        ) : (
-          <div className="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {clothings.map((product) => (
-              <div key={product.id || product._id} className="product-wrapper">
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
 
-      {/* Best Electronics Section */}
-      <section className="scroll-reveal-section container mx-auto px-4 space-y-8">
-        <div className="section-header flex justify-between items-end border-b border-white/[0.04] pb-4">
-          <div>
-            <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
-              ⚡ Best Electronics
-            </h2>
-            <p className="text-slate-400 text-xs lg:text-sm mt-1">
-              Top-rated gadgets and smart devices.
-            </p>
-          </div>
-          <Link href="/product" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
-            View All →
-          </Link>
-        </div>
+          {loading ? (
+            <ProductSkeletonGrid />
+          ) : clothings.length === 0 ? (
+            <div className="text-center py-16 text-slate-500 bg-[#111625]/40 rounded-2xl border border-white/[0.04] border-dashed">
+              No clothing products found.
+            </div>
+          ) : (
+            <div className="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              {clothings.map((product) => (
+                <div key={product.id || product._id} className="product-wrapper">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
-        {loading ? (
-          <ProductSkeletonGrid />
-        ) : electronics.length === 0 ? (
-          <div className="text-center py-16 text-slate-500 bg-[#111625]/40 rounded-2xl border border-white/[0.04] border-dashed">
-            No electronics products found.
+        {/* Best Electronics Section */}
+        <section className="scroll-reveal-section container mx-auto px-4 space-y-8">
+          <div className="section-header flex justify-between items-end border-b border-white/[0.04] pb-4">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
+                ⚡ Best Electronics
+              </h2>
+              <p className="text-slate-400 text-xs lg:text-sm mt-1">
+                Top-rated gadgets and smart devices.
+              </p>
+            </div>
+            <Link href="/product" className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors duration-200 uppercase tracking-wider">
+              View All →
+            </Link>
           </div>
-        ) : (
-          <div className="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {electronics.map((product) => (
-              <div key={product.id || product._id} className="product-wrapper">
-                <ProductCard product={product} />
-              </div>
-            ))}
+
+          {loading ? (
+            <ProductSkeletonGrid />
+          ) : electronics.length === 0 ? (
+            <div className="text-center py-16 text-slate-500 bg-[#111625]/40 rounded-2xl border border-white/[0.04] border-dashed">
+              No electronics products found.
+            </div>
+          ) : (
+            <div className="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              {electronics.map((product) => (
+                <div key={product.id || product._id} className="product-wrapper">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+        <section className="scroll-reveal-section container mx-auto px-4 space-y-8">
+          <div className="section-header flex justify-between items-end border-b border-white/[0.04] pb-4">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
+                👟 Trending Footwear
+              </h2>
+              <p className="text-slate-400 text-xs lg:text-sm mt-1">
+                Best shoes and footwear collection.
+              </p>
+            </div>
+
+            <Link
+              href="/product"
+              className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300"
+            >
+              View All →
+            </Link>
           </div>
-        )}
-      </section>
-    </div>
+
+          {loading ? (
+            <ProductSkeletonGrid />
+          ) : footwear.length === 0 ? (
+            <div className="text-center py-16 text-slate-500">
+              No footwear products found.
+            </div>
+          ) : (
+            <div className="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              {footwear.map((product) => (
+                <div key={product.id || product._id} className="product-wrapper">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+        <section className="scroll-reveal-section container mx-auto px-4 space-y-8">
+          <div className="section-header flex justify-between items-end border-b border-white/[0.04] pb-4">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
+                👜 Accessories
+              </h2>
+              <p className="text-slate-400 text-xs lg:text-sm mt-1">
+                Watches, bags and premium accessories.
+              </p>
+            </div>
+
+            <Link
+              href="/product"
+              className="text-xs lg:text-sm font-bold text-emerald-400 hover:text-emerald-300"
+            >
+              View All →
+            </Link>
+          </div>
+
+          {loading ? (
+            <ProductSkeletonGrid />
+          ) : accessories.length === 0 ? (
+            <div className="text-center py-16 text-slate-500">
+              No accessories products found.
+            </div>
+          ) : (
+            <div className="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              {accessories.map((product) => (
+                <div key={product.id || product._id} className="product-wrapper">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </BottleShowcase>
   );
 }
