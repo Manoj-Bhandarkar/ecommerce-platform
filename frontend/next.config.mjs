@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    // Bypasses the local private IP SSRF engine block safely
     unoptimized: true,
     remotePatterns: [
       {
@@ -11,8 +10,8 @@ const nextConfig = {
         pathname: '/media/**',
       },
       {
-        protocol: 'http',
-        hostname: '127.0.0.1',
+        protocol: 'https',
+        hostname: 'api.manojbhandarkar.cloud',
         port: '8000',
         pathname: '/media/**',
       },

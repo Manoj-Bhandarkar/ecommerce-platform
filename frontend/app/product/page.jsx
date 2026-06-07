@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import axios from "axios";
 import ProductCard from "@/components/ProductCard";
 import gsap from "gsap";
@@ -185,5 +185,10 @@ const ProductPageSkeletonGrid = () => (
     ))}
   </div>
 );
-
-export default ProductPage;
+export default function ProductCatalog() {
+  return (
+    <Suspense fallback={<ProductPageSkeletonGrid />}>
+      <ProductPage />
+    </Suspense>
+  );
+}
