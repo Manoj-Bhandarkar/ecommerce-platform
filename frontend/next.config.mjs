@@ -11,6 +11,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: '127.0.0.1',
+        port: '8000',
+        pathname: '/media/**',
+      },
+       {
+        protocol: 'https',
         hostname: 'api.manojbhandarkar.cloud',
         port: '8000',
         pathname: '/media/**',

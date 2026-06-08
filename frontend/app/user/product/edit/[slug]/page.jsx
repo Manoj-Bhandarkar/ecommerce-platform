@@ -34,7 +34,7 @@ const ProductEditPage = () => {
             try {
                 const [productRes, categoriesRes] = await Promise.all([
                     api.get(`/api/v1/product/${slug}`),
-                    api.get('/api/v1/categories'),
+                    api.get('/api/v1/categories/'),
                 ]);
 
                 const product = productRes.data;

@@ -25,7 +25,7 @@ const ProductCreatePage = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.get('/api/v1/categories');
+        const res = await api.get('/api/v1/categories/');
         setCategories(res.data || []);
       } catch (err) {
         console.error('Failed to fetch categories:', err);
