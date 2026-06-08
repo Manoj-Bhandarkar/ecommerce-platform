@@ -25,10 +25,10 @@ export default function Home() {
     const fetchProductByCategories = async () => {
       try {
         const [clothingsRes, electronicsRes, footwearRes, accessoriesRes] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?category=clothings&limit=4`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?category=electronics&limit=4`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?category=footwear&limit=4`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?category=accessories&limit=4`)
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=clothings&limit=4`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=electronics&limit=4`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=footwear&limit=4`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?categories=accessories&limit=4`)
         ]);
         setClothings(clothingsRes.data?.items || []);
         setElectronics(electronicsRes.data?.items || []);
