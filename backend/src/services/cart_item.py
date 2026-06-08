@@ -38,6 +38,9 @@ async def add_to_cart(
     if item:
         item.quantity = new_quantity
         item.price = product.price
+        session.add(item)  
+        await session.commit()  
+        await session.refresh(item)
     else:
         item = await CartRepository.create_cart_item(
             session=session,
@@ -105,7 +108,7 @@ async def list_user_cart(
         total_quantity=total_quantity,
         total_price=total_price,
     )
-    
+
     await redis_client.setex(cache_key, 1800, json.dumps(jsonable_encoder(response)))
     return response
 
