@@ -31,21 +31,24 @@ const ProductPage = () => {
 
   // Unified Request Fetch Loop Handler
   useEffect(() => {
+    // Guard: Avoid double triggers if state variables are still undefined or null on mount
+    if (category === undefined) return;
+
     const fetchProducts = async () => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
-        params.append("page", page);
-        params.append("limit", limit);
-
-        if (debouncedSearch.trim() !== "") {
-          params.append("title", debouncedSearch);
-        }
         if (category) {
           params.append("category", category);
         }
-        console.log("Category:", category);
-        console.log("Request:", params.toString());
+        params.append("page", page.toString());
+        params.append("limit", limit.toString());
+
+        if (debouncedSearch && debouncedSearch.trim() !== "") {
+          params.append("title", debouncedSearch.trim());
+        }
+
+
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/product/search/?${params.toString()}`
         );
@@ -60,7 +63,7 @@ const ProductPage = () => {
     };
 
     fetchProducts();
-  }, [page, debouncedSearch, category]);
+  }, [category, page, limit, debouncedSearch]);
 
   // Smooth Stagger Reveal Animations for fresh product drops
   useGSAP(() => {
