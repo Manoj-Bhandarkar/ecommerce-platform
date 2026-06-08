@@ -39,7 +39,7 @@ const ProductPage = () => {
       try {
         const params = new URLSearchParams();
         if (category) {
-          params.append("category", category);
+          params.append("categories", category);
         }
         params.append("page", page.toString());
         params.append("limit", limit.toString());
