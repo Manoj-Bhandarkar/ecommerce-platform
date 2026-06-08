@@ -30,7 +30,7 @@ const CheckoutPage = () => {
     const fetchCartAndAddresses = async () => {
         try {
             const [cartRes, addrRes] = await Promise.all([
-                api.get("/api/v1/cart"),
+                api.get("/api/v1/cart/"),
                 api.get("/api/v1/shipping/address"),
             ]);
             setCart(cartRes.data);
