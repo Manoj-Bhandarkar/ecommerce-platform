@@ -205,8 +205,48 @@ export default function OrdersPage() {
                       {' '}
                       {order.shipping_address?.pin_code}
                     </p>
+                    <p className="text-sm text-slate-500">
+                      {order.shipping_address?.phone_number}
+                    </p>
                   </div>
                 </div>
+
+                <div className="grid md:grid-cols-2 gap-6 py-5 border-b border-white/[0.04]">
+                  <div>
+                    <h4 className="text-xs uppercase text-slate-500 font-black mb-2">
+                      Shipping Status
+                    </h4>
+
+                    <span
+                      className={`px-3 py-1 rounded-lg text-[10px] uppercase font-black border ${statusColors[order.status] ||
+                        'bg-white/5 text-slate-400 border-white/10'
+                        }`}
+                    >
+                      {order.shipping_status?.status}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs uppercase text-slate-500 font-black mb-2">
+                      Shipping Update
+                    </h4>
+
+                    <p className="text-sm text-slate-400">
+                      {order.shipping_status?.updated_at &&
+                        new Date(order.shipping_status.updated_at).toLocaleString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true
+                        })
+                      }
+                    </p>
+
+                  </div>
+                </div>
+
 
                 <div className="space-y-3 py-5">
                   <h4 className="text-xs uppercase text-slate-500 font-black">

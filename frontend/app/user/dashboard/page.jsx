@@ -190,17 +190,17 @@ export default function Dashboard() {
                               <p className="text-xs text-slate-500">
                                 {order.created_at
                                   ? new Date(
-                                      order.created_at
-                                    ).toLocaleDateString('en-IN')
+                                    order.created_at
+                                  ).toLocaleDateString('en-IN')
                                   : '-'}
                               </p>
                             </div>
                           </td>
 
                           <td className="px-6 py-4">
-                            {order.customer_name ||
-                              order.user?.name ||
-                              'Customer'}
+                            {user?.email
+                              ?.split('@')[0]
+                              ?.replace(/^./, (c) => c.toUpperCase()) || 'Admin'}
                           </td>
 
                           <td className="px-6 py-4 font-semibold">
@@ -214,11 +214,11 @@ export default function Dashboard() {
                             <span
                               className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase ${
                                 ['confirmed', 'shipped', 'success'].includes(
-                                  order.status
-                                )
-                                  ? 'bg-emerald-500/10 text-emerald-400'
-                                  : 'bg-amber-500/10 text-amber-400'
-                              }`}
+                                order.status
+                              )
+                                ? 'bg-emerald-500/10 text-emerald-400'
+                                : 'bg-amber-500/10 text-amber-400'
+                                }`}
                             >
                               {order.status || 'Pending'}
                             </span>
@@ -242,8 +242,8 @@ export default function Dashboard() {
                           <p className="text-xs text-slate-500">
                             {order.created_at
                               ? new Date(
-                                  order.created_at
-                                ).toLocaleDateString('en-IN')
+                                order.created_at
+                              ).toLocaleDateString('en-IN')
                               : '-'}
                           </p>
                         </div>
@@ -251,11 +251,11 @@ export default function Dashboard() {
                         <span
                           className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase ${
                             ['confirmed', 'shipped', 'success'].includes(
-                              order.status
-                            )
-                              ? 'bg-emerald-500/10 text-emerald-400'
-                              : 'bg-amber-500/10 text-amber-400'
-                          }`}
+                            order.status
+                          )
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : 'bg-amber-500/10 text-amber-400'
+                            }`}
                         >
                           {order.status || 'Pending'}
                         </span>
