@@ -16,7 +16,7 @@ const CartPage = () => {
 
   const fetchCart = async () => {
     try {
-      const res = await api.get('/api/v1/cart');
+      const res = await api.get('/api/v1/cart/');
       setCart(res.data);
     } catch (err) {
       console.error('Failed to fetch cart:', err);
