@@ -104,7 +104,7 @@ const CartPage = () => {
                     <div className="w-24 h-24 sm:w-24 sm:h-24 relative bg-slate-950/40 rounded-xl p-2 border border-white/[0.02] flex items-center justify-center">
                       <Image
                         src={
-                          item.image_url
+                          item.product_image
                             ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${item.product_image}`
                             : "/placeholder.png"
                         }

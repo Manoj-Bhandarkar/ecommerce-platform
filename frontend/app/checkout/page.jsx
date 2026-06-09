@@ -78,7 +78,7 @@ const CheckoutPage = () => {
             });
 
             const data = res.data;
-           
+
             if (selectedGateway === "razorpay") {
                 if (typeof window === 'undefined' || !window.Razorpay) {
                     setError("Razorpay secure terminal failed to init. Refresh the dashboard.");
@@ -292,7 +292,10 @@ const CheckoutPage = () => {
                             <div className="space-y-4">
                                 {cart.items.map(item => (
                                     <div key={item.id} className="flex gap-3 sm:gap-4 items-start">
-                                        <img src={item.product_image} alt={item.product_title} className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0" />
+
+                                        <img
+                                            src={item.product_image ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/${item.product_image}` : "/placeholder.png"}
+                                            alt={item.product_title} className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0" />
                                         <div className="flex-1">
                                             <h3 className="text-xs sm:text-sm font-medium break-words">{item.product_title}</h3>
                                             <p className="text-xs text-slate-500">Qty: {item.quantity}</p>

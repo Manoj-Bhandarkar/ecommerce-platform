@@ -49,5 +49,18 @@ services:
       - db
       - redis
 
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../frontend/.env.production
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
