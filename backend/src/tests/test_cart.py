@@ -3,10 +3,7 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_get_cart(auth_client):
-    print(auth_client.cookies)
-
     response = await auth_client.get("/api/v1/cart/")
-    print(response.json())
     assert response.status_code == 200
 
 
@@ -15,8 +12,6 @@ async def test_add_to_cart(auth_client):
     response = await auth_client.post(
         "/api/v1/cart/add", json={"product_id": 722, "quantity": 1}
     )
-    print(response.status_code)
-    print(response.json())
     assert response.status_code in [200, 201]
 
 
@@ -29,8 +24,10 @@ async def test_increase_cart_item(auth_client):
 
 @pytest.mark.asyncio
 async def test_decrease_cart_item(auth_client):
-    await auth_client.post("/api/v1/cart/add", json={"product_id": 722, "quantity": 1})
-    response = await auth_client.patch("/api/v1/cart/decrease/722")
+    add_response = await auth_client.post("/api/v1/cart/add", json={"product_id": 722, "quantity": 1})
+    assert add_response.status_code == 200
+    item_id = add_response.json()["id"]
+    response = await auth_client.patch(f"/api/v1/cart/decrease/{item_id}")
     assert response.status_code == 200
 
 

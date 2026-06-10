@@ -21,12 +21,9 @@ async def create_user(session: AsyncSession, user: UserCreate):
             "hashed_password": hash_password(user.password),
         },
     )
-    print("BEFORE CELERY")
     # SEND WELCOME EMAIL
-    result = send_welcome_email_task.delay(
+    send_welcome_email_task.delay(
         str(new_user.id),
         new_user.email,
     )
-    print(result.id)
-    print("AFTER CELERY")
     return new_user

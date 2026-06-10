@@ -7,7 +7,6 @@ from src.core.email import send_email
 
 @celery_app.task
 def send_welcome_email_task(user_id: str, email: str):
-    print("TASK RECEIVED")
     token = create_email_verification_token(user_id)
     verification_link = (f"{settings.FRONTEND_URL}/verify-email?token={token}")
 

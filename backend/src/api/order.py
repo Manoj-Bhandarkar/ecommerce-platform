@@ -16,6 +16,18 @@ from src.schemas.payment import PaymentCreate
 router = APIRouter()
 
 
+@router.get("/admin/all", response_model=list[OrderOut])
+async def all_order_list(
+    session: SessionDep,
+    user: User = Depends(require_admin),
+    shipping_status: str | None = None,
+    user_id: int | None = None,
+):
+    return await all_placed_order(
+        session, shipping_status=shipping_status, user_id=user_id
+    )
+
+
 @router.post("/checkout")
 async def checkout_order(
     session: SessionDep,
@@ -46,15 +58,3 @@ async def order_cancel(
     session: SessionDep, order_id: int, user: User = Depends(get_current_user)
 ):
     return await cancel_order(session, user.id, order_id)
-
-
-@router.get("/admin/all", response_model=list[OrderOut])
-async def all_order_list(
-    session: SessionDep,
-    user: User = Depends(require_admin),
-    shipping_status: str | None = None,
-    user_id: int | None = None,
-):
-    return await all_placed_order(
-        session, shipping_status=shipping_status, user_id=user_id
-    )

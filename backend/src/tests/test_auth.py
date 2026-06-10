@@ -7,7 +7,6 @@ async def test_login_invalid_credentials(client):
         "/api/v1/auth/login",
         json={"email": "wrong@test.com", "password": "wrongpassword"},
     )
-    print(response.json())
     assert response.status_code == 401
     assert response.json()["detail"] == "Invalid credentials"
 
@@ -45,13 +44,11 @@ async def test_refresh_token_success(client):
         "/api/v1/auth/login",
         json={"email": "manoj@gmail.com", "password": "Manoj@5424"},
     )
-    print(login_response.cookies)
     refresh_token = login_response.cookies.get("refresh_token")
 
     client.cookies.set("refresh_token", refresh_token)
     assert login_response.status_code == 200
     response = await client.post("/api/v1/auth/refresh")
-    print(response.json())
     assert response.status_code == 200
     assert response.json()["message"] == "Token refresh successful"
 

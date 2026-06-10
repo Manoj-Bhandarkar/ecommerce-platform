@@ -76,10 +76,7 @@ async def get_product_by_slug(session: AsyncSession, slug: str):
     cached_data = await redis_client.get(cache_key)
 
     if cached_data:
-        print("CACHE HIT:", cache_key)
         return json.loads(cached_data)
-
-    print("CACHE MISS:", cache_key)
 
     product = await ProductRepository.get_by_slug(session=session, slug=slug)
     if not product:
@@ -115,10 +112,8 @@ async def search_products(
     cached_data = await redis_client.get(cache_key)
 
     if cached_data:
-        print("CACHE HIT:", cache_key)
         return json.loads(cached_data)
 
-    print("CACHE MISS:", cache_key)
 
     total, products = await ProductRepository.search(
         session=session,
