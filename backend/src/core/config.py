@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "FastAPI E-Commerce Backend"
     API_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://store.manojbhandarkar.cloud"]
+    CORS_ORIGINS = ["http://localhost:3000", "https://store.manojbhandarkar.cloud"]
 
     EMAIL_VERIFICATION_TOKEN_TIME_HOUR: int
     EMAIL_PASSWORD_RESET_TOKEN_TIME_HOUR: int
