@@ -45,14 +45,8 @@ jobs:
 
       - name: Create Test Environment File
         working-directory: ./backend
-        run: |
-          if [ -f .env.docker ]; then
-            cp .env.docker .env
-            echo ".env.docker copy"
-          else
-            echo "Error: .env.docker not found"
-            exit 1
-          fi
+          run: |
+            echo "${{ secrets.ENV_DOCKER }}" > .env  
 
       - name: Install Dependencies
         working-directory: ./backend
