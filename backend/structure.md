@@ -1,5 +1,13 @@
 ```
 └── 📁backend
+    └── ├── .gitignore
+        ├── README.md
+    └── 📁alembic
+        ├── env.py
+        ├── README
+        ├── script.py.mako
+    └── 📁htmlcov
+    └── 📁media
     └── 📁src
         └── 📁api
             ├── admin.py
@@ -72,18 +80,26 @@
             ├── email_tasks.py
         └── 📁tests
             ├── conftest.py
+            ├── test_auth.py
+            ├── test_cart.py
             ├── test_main.py
+            ├── test_order.py
+            ├── test_product.py
         └── 📁utils
             ├── file.py
             ├── payment.py
             ├── slug.py
         ├── celery_app.py
         ├── main.py
+        ├── .gitignore
+        ├── pyvenv.cfg
+    ├── .coverage
     ├── .env
     ├── .env.docker
     ├── alembic.ini
     ├── docker-compose.yml
     ├── Dockerfile
     ├── pytest.ini
-    └── requirements.txt
+    ├── requirements.txt
+    └── structure.md
 ```
