@@ -45,8 +45,8 @@ jobs:
 
       - name: Create Test Environment File
         working-directory: ./backend
-          run: |
-            echo "${{ secrets.ENV_DOCKER }}" > .env  
+        run: |
+          echo "${{ secrets.ENV_DOCKER }}" > .env  
 
       - name: Install Dependencies
         working-directory: ./backend
