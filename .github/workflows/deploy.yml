@@ -48,7 +48,7 @@ jobs:
         run: |
           if [ -f .env.docker ]; then
             cp .env.docker .env
-            echo ".env.docker copy
+            echo ".env.docker copy"
           else
             echo "Error: .env.docker not found"
             exit 1
