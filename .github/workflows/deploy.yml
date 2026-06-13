@@ -43,11 +43,16 @@ jobs:
           echo "Waiting for Postgres..."
           sleep 7
 
-      - name: Create Environment File from GitHub Secrets
+      - name: Create Test Environment File
         working-directory: ./backend
         run: |
-          echo "${{ secrets.ENV_DOCKER_CONTENT }}" > .env
-          echo "Environment file successfully generated from secrets"
+          if [ -f .env.docker ]; then
+            cp .env.docker .env
+            echo ".env.docker copy
+          else
+            echo "Error: .env.docker not found"
+            exit 1
+          fi
 
       - name: Install Dependencies
         working-directory: ./backend
