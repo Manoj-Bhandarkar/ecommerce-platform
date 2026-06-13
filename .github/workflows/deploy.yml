@@ -41,18 +41,13 @@ jobs:
       - name: Wait for PostgreSQL to be ready
         run: |
           echo "Waiting for Postgres..."
-          sleep 5
+          sleep 7
 
-      - name: Prepare Environment File
+      - name: Create Environment File from GitHub Secrets
         working-directory: ./backend
         run: |
-          if [ -f .env.docker ]; then
-            cp .env.docker .env
-            echo ".env.docker copy"
-          else
-            touch .env
-            echo "Warning: .env.docker not create .env"
-          fi
+          echo "${{ secrets.ENV_DOCKER_CONTENT }}" > .env
+          echo "Environment file successfully generated from secrets"
 
       - name: Install Dependencies
         working-directory: ./backend
