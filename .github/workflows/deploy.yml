@@ -40,25 +40,22 @@ jobs:
         echo "Waiting for Postgres..."
         sleep 7
 
-    - name: Create Environment File From Secret
-      uses: bradenwright/configure-env-file@v1
-      with:
-        token: ${{ secrets.ENV_DOCKER }}
-        filename: ./backend/.env
-
     - name: Install Dependencies
       working-directory: ./backend
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Pytest Coverage
+    - name: Run Pytest Coverage with Safe Env Injections
       working-directory: ./backend
       env:
-        CORS_ORIGINS: '["http://localhost:3000", "https://manojbhandarkar.cloud"]'
+        ENV_DOCKER_DATA: ${{ secrets.ENV_DOCKER }}
         DB_HOST: "localhost"
         TEST_DATABASE_URL: "postgresql+asyncpg://test_user:test123@localhost:5432/test_db"
+        CORS_ORIGINS: '["http://localhost:3000", "https://manojbhandarkar.cloud"]'
       run: |
+        python -c "import os; open('.env', 'w').write(os.environ.get('ENV_DOCKER_DATA', ''))"
+        echo "Environment mapping successful! 📂"
         pytest --cov=src
 
   # JOB 2: DEPLOYMENT (Continuous Deployment)
