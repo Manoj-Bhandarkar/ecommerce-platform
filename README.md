@@ -100,6 +100,8 @@ A full-stack E-Commerce application built with **FastAPI**, **Next.js**, **Postg
 * Email Services
 * Dockerized Deployment
 * Nginx Reverse Proxy
+* Automated Testing with 100% Green Assertions
+* Production-Ready GitHub Actions CI/CD Pipeline
 
 ---
 
@@ -255,11 +257,11 @@ CartItem      OrderItem   Payment
 * Axios
 * Context API
 
-## DevOps
-
-* Docker
-* Docker Compose
-* Nginx
+## DevOps & Testing
+* Docker & Docker Compose
+* Nginx (Reverse Proxy & SSL Integration)
+* GitHub Actions (Automated CI/CD Pipeline)
+* Pytest & Pytest-Cov (Automated Testing Suite)
 
 ---
 
@@ -422,6 +424,9 @@ NEXT_PUBLIC_RAZORPAY_KEY=
 * Implemented Redis and Celery for asynchronous task processing.
 * Containerized services using Docker and Docker Compose.
 * Built responsive admin dashboard and customer-facing UI.
+* Architected a robust CI/CD pipeline using **GitHub Actions** to automate production test suites against isolated multi-container environments (**PostgreSQL + Redis**), enabling automated deployment to AWS EC2 on successful builds.
+* Achieved full unit-testing coverage across core e-commerce workflows (Auth, Cart, Orders, Products, and Shipping) using **Pytest** with dynamic mock seeding and safe transaction isolation.
+
 
 ---
 
