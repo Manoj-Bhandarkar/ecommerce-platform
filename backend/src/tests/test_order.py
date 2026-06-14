@@ -65,29 +65,35 @@ async def test_checkout_success(auth_client, db_session):
             await redis_client.flushdb()
         except Exception:
             pass
+
     user_result = await db_session.execute(
         select(User).where(User.email == "manoj@gmail.com")
     )
     current_user = user_result.scalar_one()
+
     await db_session.execute(
         delete(CartItem).where(CartItem.user_id == current_user.id)
     )
     await db_session.flush()
-    prod_result = await db_session.execute(select(Product).where(Product.id == 721))
-    db_product = prod_result.scalar_one()
-    if not db_product:
-        db_product = Product(
-            id=721,
-            title="Order Test Product",
-            sku="SKU-ORDER-721",
-            price=Decimal("1358.00"),
-            description="Test Description Product", # 💡 हे नवीन फील्ड जोडले!
-            stock_quantity=10,
-            is_active=True
-        )
-        db_session.add(db_product)
-        await db_session.flush()
+
+    await db_session.execute(delete(Product).where(Product.id == 721))
+    await db_session.flush()
+
+    db_product = Product(
+        id=721,
+        title="Order Test Product",
+        slug="order-test-product",
+        sku="SKU-ORDER-721",
+        price=Decimal("1358.00"),
+        description="This is a mandatory product description string to pass pydantic validation", 
+        stock_quantity=10,
+        is_active=True
+    )
+    db_session.add(db_product)
+    await db_session.flush()
+    
     product_price = db_product.price
+
     address_response = await auth_client.post(
         "/api/v1/shipping/address",
         json={
@@ -102,6 +108,10 @@ async def test_checkout_success(auth_client, db_session):
     )
     assert address_response.json()
     address_id = address_response.json()["id"]
+
+    await db_session.commit()
+    await db_session.begin()
+
     quantity = 1
     cart_res = await auth_client.post(
         "/api/v1/cart/add",
@@ -111,7 +121,9 @@ async def test_checkout_success(auth_client, db_session):
         },
     )
     assert cart_res.status_code in [200, 201]
+
     total_amount_str = f"{product_price * quantity:.2f}"
+    
     response = await auth_client.post(
         "/api/v1/order/checkout",
         json={
@@ -121,12 +133,11 @@ async def test_checkout_success(auth_client, db_session):
             "simulate_success": True,
         },
     )
+
     if response.status_code == 400 and "mismatch" in response.text:
         cart_view = await auth_client.get("/api/v1/cart/")
         if cart_view.status_code == 200:
-            actual_amount = cart_view.json().get("total_price") or cart_view.json().get(
-                "grand_total"
-            )
+            actual_amount = cart_view.json().get("total_price") or cart_view.json().get("grand_total")
             if actual_amount is not None:
                 response = await auth_client.post(
                     "/api/v1/order/checkout",
@@ -137,6 +148,7 @@ async def test_checkout_success(auth_client, db_session):
                         "simulate_success": True,
                     },
                 )
-    assert response.status_code == 200
+
+    assert response.status_code == 200, f"Checkout failed: {response.json()}"
     assert "order" in response.json()
     assert "payment" in response.json()
