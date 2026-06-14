@@ -40,32 +40,11 @@ jobs:
         echo "Waiting for Postgres..."
         sleep 7
 
-    - name: Copy env
-      working-directory: backend
-      run: |
-        echo "${{ secrets.ENV_DOCKER }}" > .env
-
-    - name: Debug env
-      working-directory: backend
-      run: |
-        echo "=== CORS ==="
-        grep CORS_ORIGINS .env
-
-        echo "=== DB ==="
-        grep DB_HOST .env
-
-        echo "=== First 20 lines ==="
-        head -20 .env
-
-    - name: Check CORS
-      working-directory: backend
-      run: |
-        grep CORS_ORIGINS .env
-
-    - name: Show env file
-      working-directory: backend
-      run: |
-        cat .env
+    - name: Create Environment File From Secret
+      uses: bradenwright/configure-env-file@v1
+      with:
+        token: ${{ secrets.ENV_DOCKER }}
+        filename: ./backend/.env
 
     - name: Install Dependencies
       working-directory: ./backend
@@ -76,6 +55,7 @@ jobs:
     - name: Run Pytest Coverage
       working-directory: ./backend
       env:
+        CORS_ORIGINS: '["http://localhost:3000", "https://manojbhandarkar.cloud"]'
         DB_HOST: "localhost"
         TEST_DATABASE_URL: "postgresql+asyncpg://test_user:test123@localhost:5432/test_db"
       run: |
