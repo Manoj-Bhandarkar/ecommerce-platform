@@ -43,7 +43,7 @@ jobs:
     - name: Copy env
       working-directory: backend
       run: |
-        cp .env.docker .env
+        echo "${{ secrets.ENV_DOCKER }}" > .env
 
     - name: Debug env
       working-directory: backend
@@ -56,6 +56,11 @@ jobs:
 
         echo "=== First 20 lines ==="
         head -20 .env
+
+    - name: Show env file
+      working-directory: backend
+      run: |
+        cat .env
 
     - name: Install Dependencies
       working-directory: ./backend
