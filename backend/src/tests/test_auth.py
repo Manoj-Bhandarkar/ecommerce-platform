@@ -77,4 +77,4 @@ async def test_send_password_reset_email(client):
         "/api/v1/auth/send-password-reset-email", json={"email": "manoj@gmail.com"}
     )
     assert response.status_code == 200
-    assert response.json()["message"] == "If account exists, reset link sent"
+    assert response.json()["message"] == "Password reset link sent"
