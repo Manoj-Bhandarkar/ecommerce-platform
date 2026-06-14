@@ -1,9 +1,13 @@
 import pytest
+from sqlalchemy import select
+from sqlalchemy import delete
 from src.models.user import User
 from src.core.security import hash_password
 
 @pytest.fixture(autouse=True)
 async def setup_auth_user(db_session):
+    await db_session.execute(delete(User).where(User.email == "manoj@gmail.com"))
+    await db_session.flush()
     secure_pass = hash_password("Manoj@5424")
     user = User(
         email="manoj@gmail.com",
@@ -11,8 +15,8 @@ async def setup_auth_user(db_session):
         is_verified=True,
     )
     db_session.add(user)
-    await db_session.flush()
-    await db_session.refresh(user)
+    await db_session.commit()
+    await db_session.begin()
     return user
 
 @pytest.mark.asyncio
