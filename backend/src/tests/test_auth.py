@@ -1,5 +1,19 @@
 import pytest
+from src.models.user import User
+from src.core.security import hash_password
 
+@pytest.fixture(autouse=True)
+async def setup_auth_user(db_session):
+    secure_pass = hash_password("Manoj@5424")
+    user = User(
+        email="manoj@gmail.com",
+        hashed_password=secure_pass, 
+        is_verified=True,
+    )
+    db_session.add(user)
+    await db_session.flush()
+    await db_session.refresh(user)
+    return user
 
 @pytest.mark.asyncio
 async def test_login_invalid_credentials(client):
@@ -59,4 +73,4 @@ async def test_send_password_reset_email(client):
         "/api/v1/auth/send-password-reset-email", json={"email": "manoj@gmail.com"}
     )
     assert response.status_code == 200
-    assert response.json()["message"] == "Password reset link sent"
+    assert response.json()["message"] == "If account exists, reset link sent"

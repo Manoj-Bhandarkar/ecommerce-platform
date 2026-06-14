@@ -1,3 +1,4 @@
+from decimal import Decimal
 import pytest
 from sqlalchemy import select, delete
 from src.models.user import User
@@ -74,6 +75,18 @@ async def test_checkout_success(auth_client, db_session):
     await db_session.flush()
     prod_result = await db_session.execute(select(Product).where(Product.id == 721))
     db_product = prod_result.scalar_one()
+    if not db_product:
+        db_product = Product(
+            id=721,
+            title="Order Test Product",
+            sku="SKU-ORDER-721",
+            price=Decimal("1358.00"),
+            description="Test Description Product", # 💡 हे नवीन फील्ड जोडले!
+            stock_quantity=10,
+            is_active=True
+        )
+        db_session.add(db_product)
+        await db_session.flush()
     product_price = db_product.price
     address_response = await auth_client.post(
         "/api/v1/shipping/address",
