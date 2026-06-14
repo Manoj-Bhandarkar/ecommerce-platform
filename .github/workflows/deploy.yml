@@ -57,6 +57,11 @@ jobs:
         echo "=== First 20 lines ==="
         head -20 .env
 
+    - name: Check CORS
+      working-directory: backend
+      run: |
+        grep CORS_ORIGINS .env
+
     - name: Show env file
       working-directory: backend
       run: |
