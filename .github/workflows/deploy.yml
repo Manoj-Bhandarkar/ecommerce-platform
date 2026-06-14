@@ -19,9 +19,9 @@ jobs:
       postgres_test_db:
         image: postgres:15
         env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: root
-          POSTGRES_DB: ecommerce_db
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test123
         ports:
         - 5432:5432
         options: >-
@@ -60,9 +60,9 @@ jobs:
         ENV_DOCKER_DATA: ${{ secrets.ENV_DOCKER }}
         DB_HOST: "localhost"
         DB_PORT: "5432"
-        DB_USER: "root"
-        DB_PASS: "root"
-        DB_NAME: "ecommerce_db"
+        DB_USER: "test_user"
+        DB_PASS: "test123"
+        DB_NAME: "test_db"
         REDIS_HOST: "localhost"
         REDIS_PORT: "6379"
         TEST_DATABASE_URL: "postgresql+asyncpg://test_user:test123@localhost:5432/test_db"
@@ -70,6 +70,8 @@ jobs:
       run: |
         python -c "import os; open('.env', 'w').write(os.environ.get('ENV_DOCKER_DATA', ''))"
         echo "Environment mapping successful! 📂"
+        docker exec ${{ job.services.postgres_test_db.id }} psql -U test_user -d test_db -c "CREATE DATABASE ecommerce_db;" || true
+        docker exec ${{ job.services.postgres_test_db.id }} psql -U test_user -d test_db -c "CREATE USER root WITH PASSWORD 'root' SUPERUSER;" || true
         pytest --cov=src
 
   # JOB 2: DEPLOYMENT (Continuous Deployment)
