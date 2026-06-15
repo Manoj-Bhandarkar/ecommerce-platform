@@ -1,6 +1,14 @@
 # 🛒 E-Commerce Platform
 
-A full-stack E-Commerce application built with **FastAPI**, **Next.js**, **PostgreSQL**, **Redis**, **Celery**, and **Docker**. The platform provides a complete shopping experience with secure authentication, product management, order processing, payment integration, shipping tracking, and an admin dashboard.
+🚀 Production-ready full-stack E-Commerce application built with FastAPI, Next.js, PostgreSQL, Redis, Docker and AWS.
+
+### 🔗 Live Links
+
+🌐 Store: https://store.manojbhandarkar.cloud
+
+📘 API Docs: https://api.manojbhandarkar.cloud/docs
+
+💻 GitHub Repository: https://github.com/Manoj-Bhandarkar/ecommerce-platform
 
 ---
 
@@ -114,6 +122,34 @@ A full-stack E-Commerce application built with **FastAPI**, **Next.js**, **Postg
 * Responsive Design
 * Protected Pages
 * Admin Dashboard UI
+---
+# 📸 Application Screenshots
+
+## 🏠 Home Page
+<img width="1588" height="6013" alt="store manojbhandarkar cloud_" src="https://github.com/user-attachments/assets/eae10073-d630-47a0-ab6b-2b20560f7d43" />
+---
+
+## 📦 Product Details
+
+![Product Details](screenshots/product-details.png)
+
+---
+
+## 🛒 Admin Dashboard
+
+![Uploading store.manojbhandarkar.cloud_ (1).png…]()
+
+---
+
+## 📘 API Documentation
+
+<img width="1588" height="6364" alt="api manojbhandarkar cloud_docs" src="https://github.com/user-attachments/assets/1d738fcc-a016-4262-9491-3cb2b8d1b439" />
+
+---
+
+## ⚙️ CI/CD Pipeline
+
+<img width="1378" height="1126" alt="github com_Manoj-Bhandarkar_ecommerce-platform_actions_runs_27501802281" src="https://github.com/user-attachments/assets/482f7c13-77c8-4fb8-9c9f-bd50669f2fdb" />
 
 ---
 
@@ -272,16 +308,18 @@ ecommerce-app/
 │
 ├── backend/
 │   ├── app/
-│   │   ├── auth/
-│   │   ├── user/
-│   │   ├── product/
-│   │   ├── category/
-│   │   ├── cart/
-│   │   ├── order/
-│   │   ├── payment/
-│   │   ├── shipping/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── db/
+│   │   ├── dependencies/
+│   │   ├── models/
+│   │   ├── repositories/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── tasks/
+│   │   ├── tests/
+│   │   ├── utils/
 │   │   └── admin/
-│   │
 │   ├── alembic/
 │   ├── requirements.txt
 │   ├── Dockerfile
@@ -289,13 +327,24 @@ ecommerce-app/
 │
 ├── frontend/
 │   ├── app/
+│   │   ├── cart/
+│   │   ├── ccheckout/
+│   │   ├── login/
+│   │   ├── product/
+│   │   ├── register/
+│   │   ├── user/
+│   │   │   ├── address/
+│   │   │   ├── category/
+│   │   │   ├── dashboard/
+│   │   │   ├── order/
+│   │   │   ├── payments/
+│   │   │   ├── product/
+│   │   │   ├── shippingstatus/
 │   ├── components/
 │   ├── context/
 │   ├── utils/
 │   └── package.json
-│
 ├── screenshots/
-│
 └── README.md
 ```
 
