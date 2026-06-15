@@ -129,15 +129,9 @@
 <img width="1588" height="6013" alt="store manojbhandarkar cloud_" src="https://github.com/user-attachments/assets/eae10073-d630-47a0-ab6b-2b20560f7d43" />
 ---
 
-## 📦 Product Details
-
-![Product Details](screenshots/product-details.png)
-
----
-
 ## 🛒 Admin Dashboard
 
-![Uploading store.manojbhandarkar.cloud_ (1).png…]()
+<img width="1378" height="1773" alt="store manojbhandarkar cloud_user_dashboard" src="https://github.com/user-attachments/assets/2cd1a291-3847-479a-b56c-738ac278797c" />
 
 ---
 
