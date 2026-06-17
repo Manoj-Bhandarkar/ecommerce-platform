@@ -16,112 +16,68 @@
 
 ### 👤 Authentication & Authorization
 
-* JWT Authentication
-* Refresh Token Support
-* Email Verification
-* Password Reset via Email
-* Role-Based Access Control (Admin/User)
-* Protected Routes
+* JWT Authentication           * Refresh Token Support           * Email Verification           * Password Reset via Email
+* Protected Routes             * Role-Based Access Control (Admin/User)
 
 ---
 
 ### 📦 Product Management
 
-* Create Products
-* Update Products
-* Delete Products
-* Product Search
-* Pagination
-* Product Image Upload
-* Inventory Management
-* Low Stock Monitoring
+* Create Products              * Update Products                  * Delete Products             * Product Search
+* Pagination                   * Product Image Upload             * Inventory Management        * Low Stock Monitoring
 * Multiple Categories per Product
 
 ---
 
 ### 📂 Category Management
 
-* Create Categories
-* Delete Categories
-* Product Count Per Category
+* Create Categories            * Delete Categories                * Product Count Per Category
 
 ---
 
 ### 🛒 Shopping Cart
 
-* Add Products to Cart
-* Update Quantity
-* Remove Products
-* View Cart Summary
-* Automatic Total Calculation
+* Add Products to Cart         * Update Quantity                  * Remove Products              * View Cart Summary           * Automatic Total Calculation
 
 ---
 
 ### 📋 Order Management
 
-* Place Orders
-* View Order History
-* Cancel Orders
-* Order Status Tracking
+* Place Orders                 * View Order History               * Cancel Orders               * Order Status Tracking
 
 ---
 
 ### 🚚 Shipping Management
 
-* Shipping Address Management
-* Shipping Status Updates
-* Admin Shipping Control Panel
-* Delivery Tracking
+* Shipping Address Management           * Shipping Status Updates          * Admin Shipping Control Panel           * Delivery Tracking
 
 ---
 
 ### 💳 Payment Integration
 
-* Razorpay Integration
-* Secure Payment Verification
-* Payment History
-* Transaction Tracking
+* Razorpay Integration           * Secure Payment Verification           * Payment History           * Transaction Tracking
 
 ---
 
 ### 📊 Admin Dashboard
 
-* Revenue Analytics
-* Total Products
-* Total Orders
-* Total Users
-* Pending Orders
-* Low Stock Alerts
-* Recent Orders Tracker
+* Revenue Analytics           * Total Products           * Total Orders           * Total Users           * Pending Orders
+* Low Stock Alerts            * Recent Orders Tracker
 
 ---
 
 ### ⚙️ Backend Features
 
-* FastAPI REST API
-* SQLAlchemy 2.0 ORM
-* PostgreSQL Database
-* Alembic Migrations
-* Pydantic Validation
-* Redis Caching
-* Celery Background Tasks
-* Email Services
-* Dockerized Deployment
-* Nginx Reverse Proxy
-* Automated Testing with 100% Green Assertions
-* Production-Ready GitHub Actions CI/CD Pipeline
+* FastAPI REST API           * SQLAlchemy 2.0 ORM           * PostgreSQL Database           * Alembic Migrations           * Pydantic Validation
+* Redis Caching              * Celery Background Tasks      * Email Services                * Dockerized Deployment        * Nginx Reverse Proxy
+* Automated Testing with 100% Green Assertions              * Production-Ready GitHub Actions CI/CD Pipeline
 
 ---
 
 ### 🎨 Frontend Features
 
-* Next.js 15 App Router
-* Tailwind CSS
-* Axios API Integration
-* Context API State Management
-* Responsive Design
-* Protected Pages
-* Admin Dashboard UI
+* Next.js 15 App Router       * Tailwind CSS                * Axios API Integration         * Context API State Management
+* Responsive Design           * Protected Pages             * Admin Dashboard UI
 ---
 # 📸 Application Screenshots
 
@@ -137,7 +93,7 @@
 
 ## 📘 API Documentation
 
-<img width="1588" height="6364" alt="api manojbhandarkar cloud_docs" src="https://github.com/user-attachments/assets/1d738fcc-a016-4262-9491-3cb2b8d1b439" />
+<img width="1588" height="3916" alt="api" src="https://github.com/user-attachments/assets/a3706eac-550d-493f-8a67-9f57d2b70be3" />
 
 ---
 
@@ -149,28 +105,32 @@
 
 # 🏗️ System Architecture
 
-```text
-┌──────────────────────┐
-│      Next.js UI      │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│      FastAPI API     │
-└───────┬───────┬──────┘
-        │       │
-        │       ▼
-        │   Redis Cache
-        │
-        ▼
- PostgreSQL Database
+```mermaid
+graph TD
+    %% Nodes Definition
+    UI["💻 Next.js UI"]
+    API["⚡ FastAPI API"]
+    Redis[("🛑 Redis Cache")]
+    DB[("🐘 PostgreSQL Database")]
+    Celery["⚙️ Celery Background Tasks"]
+    Email["📧 Email Service"]
 
-        │
-        ▼
- Celery Background Tasks
-        │
-        ▼
- Email Service
+    %% Flow/Connections
+    UI --> API
+    API --> Redis
+    API --> DB
+    DB --> Celery
+    Celery --> Email
+
+    %% Styling (Optional but looks professional)
+    style UI fill:#000,stroke:#fff,stroke-width:2px,color:#fff
+    style API fill:#009688,stroke:#fff,stroke-width:2px,color:#fff
+    style Redis fill:#dc3545,stroke:#fff,stroke-width:2px,color:#fff
+    style DB fill:#336791,stroke:#fff,stroke-width:2px,color:#fff
+    style Celery fill:#3776AB,stroke:#fff,stroke-width:2px,color:#fff
+    style Email fill:#ffc107,stroke:#333,stroke-width:2px,color:#333
+```
+
 ```
 
 ---
@@ -179,87 +139,75 @@
 
 ## Main Entities
 
-### User
+<table>
+  <tr>
+    <!-- USER TABLE -->
+    <td valign="top" width="20%">
+      <strong>👤 User</strong>
+      <ul>
+        <li>id</li>
+        <li>email</li>
+        <li>password</li>
+        <li>is_verified</li>
+        <li>role</li>
+        <li>created_at</li>
+      </ul>
+    </td>
+    
+    <!-- PRODUCT TABLE -->
+    <td valign="top" width="20%">
+      <strong>📦 Product</strong>
+      <ul>
+        <li>id</li>
+        <li>title</li>
+        <li>slug</li>
+        <li>description</li>
+        <li>sku</li>
+        <li>price</li>
+        <li>stock_quantity</li>
+        <li>image_url</li>
+      </ul>
+    </td>
 
-```text
-User
-├── id
-├── email
-├── password
-├── is_verified
-├── role
-└── created_at
-```
+    <!-- CATEGORY TABLE -->
+    <td valign="top" width="20%">
+      <strong>🏷️ Category</strong>
+      <ul>
+        <li>id</li>
+        <li>name</li>
+      </ul>
+    </td>
 
-### Product
+    <!-- ORDER TABLE -->
+    <td valign="top" width="20%">
+      <strong>🛒 Order</strong>
+      <ul>
+        <li>id</li>
+        <li>user_id</li>
+        <li>total_price</li>
+        <li>status</li>
+        <li>created_at</li>
+      </ul>
+    </td>
 
-```text
-Product
-├── id
-├── title
-├── slug
-├── description
-├── sku
-├── price
-├── stock_quantity
-└── image_url
-```
-
-### Category
-
-```text
-Category
-├── id
-└── name
-```
-
-### Order
-
-```text
-Order
-├── id
-├── user_id
-├── total_price
-├── status
-└── created_at
-```
-
-### Payment
-
-```text
-Payment
-├── id
-├── order_id
-├── amount
-├── gateway
-├── is_paid
-└── status
-```
-
+    <!-- PAYMENT TABLE -->
+    <td valign="top" width="20%">
+      <strong>💳 Payment</strong>
+      <ul>
+        <li>id</li>
+        <li>order_id</li>
+        <li>amount</li>
+        <li>gateway</li>
+        <li>is_paid</li>
+        <li>status</li>
+      </ul>
+    </td>
+  </tr>
+</table>
 ---
 
 # ER Diagram
 
-```text
-User
- │
- ├───────────────┐
- │               │
- ▼               ▼
-Cart           Order
- │               │
- │               ├───────────┐
- ▼               ▼           ▼
-CartItem      OrderItem   Payment
-                  │
-                  ▼
-               Product
-                  ▲
-                  │
-         ProductCategory
-                  │
-                  ▼
-               Category
 ```
 <img width="1536" height="1024" alt="E-R Diagram" src="https://github.com/user-attachments/assets/0dc66943-441b-4b12-bb02-805b3e5877c0" />
 
@@ -269,28 +217,15 @@ CartItem      OrderItem   Payment
 
 ## Backend
 
-* FastAPI
-* SQLAlchemy 2.0
-* PostgreSQL
-* Alembic
-* Redis
-* Celery
-* JWT
-* Pydantic
-* Razorpay
+* FastAPI           * SQLAlchemy 2.0           * PostgreSQL           * Alembic           * Redis           * Celery
+* JWT               * Pydantic                 * Razorpay
 
 ## Frontend
 
-* Next.js 15
-* React
-* Tailwind CSS
-* Axios
-* Context API
+* Next.js 15        * React                    * Tailwind CSS         * Axios             * Context API
 
 ## DevOps & Testing
-* Docker & Docker Compose
-* Nginx (Reverse Proxy & SSL Integration)
-* GitHub Actions (Automated CI/CD Pipeline)
+* Docker & Docker Compose           * Nginx (Reverse Proxy & SSL Integration)           * GitHub Actions (Automated CI/CD Pipeline)
 * Pytest & Pytest-Cov (Automated Testing Suite)
 
 ---
@@ -349,7 +284,7 @@ ecommerce-app/
 ## Backend
 
 ```bash
-git clone https://github.com/yourusername/ecommerce-app.git
+git clone https://github.com/manoj-bhandarkar/ecommerce-platform.git
 
 cd backend
 
@@ -447,29 +382,7 @@ NEXT_PUBLIC_RAZORPAY_KEY=
 
 # Future Improvements
 
-* Product Reviews & Ratings
-* Wishlist
-* Coupons & Discounts
-* Sales Reports
-* Multi-Vendor Marketplace
-* Product Recommendations
-* Elasticsearch Integration
-* Real-Time Notifications
-
----
-
-# Resume Highlights
-
-* Developed a production-style E-Commerce platform using FastAPI and Next.js.
-* Implemented JWT authentication and role-based authorization.
-* Integrated Razorpay payment gateway.
-* Designed scalable PostgreSQL database architecture.
-* Implemented Redis and Celery for asynchronous task processing.
-* Containerized services using Docker and Docker Compose.
-* Built responsive admin dashboard and customer-facing UI.
-* Architected a robust CI/CD pipeline using **GitHub Actions** to automate production test suites against isolated multi-container environments (**PostgreSQL + Redis**), enabling automated deployment to AWS EC2 on successful builds.
-* Achieved full unit-testing coverage across core e-commerce workflows (Auth, Cart, Orders, Products, and Shipping) using **Pytest** with dynamic mock seeding and safe transaction isolation.
-
+* Product Reviews & Ratings           * Wishlist           * Coupons & Discounts           * Sales Reports
 
 ---
 
