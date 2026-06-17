@@ -134,72 +134,8 @@ graph TD
 # 🗄️ Database Design
 
 ## Main Entities
+<img width="832" height="237" alt="image" src="https://github.com/user-attachments/assets/dfe003e5-d657-4d8a-b768-a76e220ec706" />
 
-<table>
-  <tr>
-    <!-- USER TABLE -->
-    <td valign="top" width="20%">
-      <strong>👤 User</strong>
-      <ul>
-        <li>id</li>
-        <li>email</li>
-        <li>password</li>
-        <li>is_verified</li>
-        <li>role</li>
-        <li>created_at</li>
-      </ul>
-    </td>
-    
-    <!-- PRODUCT TABLE -->
-    <td valign="top" width="20%">
-      <strong>📦 Product</strong>
-      <ul>
-        <li>id</li>
-        <li>title</li>
-        <li>slug</li>
-        <li>description</li>
-        <li>sku</li>
-        <li>price</li>
-        <li>stock_quantity</li>
-        <li>image_url</li>
-      </ul>
-    </td>
-
-    <!-- CATEGORY TABLE -->
-    <td valign="top" width="20%">
-      <strong>🏷️ Category</strong>
-      <ul>
-        <li>id</li>
-        <li>name</li>
-      </ul>
-    </td>
-
-    <!-- ORDER TABLE -->
-    <td valign="top" width="20%">
-      <strong>🛒 Order</strong>
-      <ul>
-        <li>id</li>
-        <li>user_id</li>
-        <li>total_price</li>
-        <li>status</li>
-        <li>created_at</li>
-      </ul>
-    </td>
-
-    <!-- PAYMENT TABLE -->
-    <td valign="top" width="20%">
-      <strong>💳 Payment</strong>
-      <ul>
-        <li>id</li>
-        <li>order_id</li>
-        <li>amount</li>
-        <li>gateway</li>
-        <li>is_paid</li>
-        <li>status</li>
-      </ul>
-    </td>
-  </tr>
-</table>
 ---
 
 # ER Diagram
