@@ -103,41 +103,6 @@
 
 ---
 
-# 🏗️ System Architecture
-
-```mermaid
-graph TD
-    %% Nodes Definition
-    UI["💻 Next.js UI"]
-    API["⚡ FastAPI API"]
-    Redis[("🛑 Redis Cache")]
-    DB[("🐘 PostgreSQL Database")]
-    Celery["⚙️ Celery Background Tasks"]
-    Email["📧 Email Service"]
-
-    %% Flow/Connections
-    UI --> API
-    API --> Redis
-    API --> DB
-    DB --> Celery
-    Celery --> Email
-
-    %% Styling (Optional but looks professional)
-    style UI fill:#000,stroke:#fff,stroke-width:2px,color:#fff
-    style API fill:#009688,stroke:#fff,stroke-width:2px,color:#fff
-    style Redis fill:#dc3545,stroke:#fff,stroke-width:2px,color:#fff
-    style DB fill:#336791,stroke:#fff,stroke-width:2px,color:#fff
-    style Celery fill:#3776AB,stroke:#fff,stroke-width:2px,color:#fff
-    style Email fill:#ffc107,stroke:#333,stroke-width:2px,color:#333
-```
-
-# 🗄️ Database Design
-
-## Main Entities
-<img width="832" height="237" alt="image" src="https://github.com/user-attachments/assets/dfe003e5-d657-4d8a-b768-a76e220ec706" />
-
----
-
 # ER Diagram
 
 <img width="1536" height="1024" alt="E-R Diagram" src="https://github.com/user-attachments/assets/0dc66943-441b-4b12-bb02-805b3e5877c0" />
