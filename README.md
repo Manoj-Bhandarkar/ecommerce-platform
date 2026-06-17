@@ -138,7 +138,7 @@ graph TD
 # 🗄️ Database Design
 
 ## Main Entities
-
+---
 <table>
   <tr>
     <!-- USER TABLE -->
